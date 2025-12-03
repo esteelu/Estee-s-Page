@@ -1,9 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="citation_title" content="Costly Job Search with Inattentive Workers">
+    <meta name="citation_author" content="Lu, Siting Estee">
+    <meta name="citation_publication_date" content="2024-11-08">
+    <meta name="citation_publisher" content="sitingesteelu.com">
+    <meta name="citation_pdf_url" content="https://www.sitingesteelu.com/papers/Costly_Job_Search_with_Inattentive_Workers_Siting__Estee__Lu.pdf">
+    <meta name="citation_abstract" content="Labour market mismatch can arise from workers having limited attention. This paper proposes a Generalized Partially Directed Search model, extending on existing literature by allowing inattentive workers to have diverse priors and heterogeneous attention costs. I show that mismatch can be inherited from bias in workers’ default search strategies, and heterogeneous attention costs could contribute to greater variability in the equilibrium outcomes. I also explore equilibrium multiplicity that was not adequately accounted for in previous studies. Equilibria where workers adopt different application strategies may generate both higher market efficiency and lower monopsony power than when workers employ the same application strategies. This information-theoretic approach to model job search offers new policy insights on the basis of attention.">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Siting Estee Lu | Economics PhD Candidate</title>
+    <title>Siting Estee Lu | Stipendiary Fellow in Economics</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -231,6 +238,47 @@
             border-bottom: 1px solid var(--accent-color);
         }
 
+        /* --- GOOGLE SITE HIGHLIGHT BOX --- */
+        .google-site-highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
+            margin-bottom: 40px;
+            color: white;
+            text-align: center;
+        }
+
+        .google-site-highlight h3 {
+            color: white;
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+        }
+
+        .google-site-highlight p {
+            margin-bottom: 20px;
+            opacity: 0.95;
+            font-size: 1rem;
+        }
+
+        .google-site-link {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .google-site-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            color: #667eea;
+        }
+
         /* --- FOOTER --- */
         footer {
             text-align: center;
@@ -239,6 +287,10 @@
             padding: 40px 0;
             margin-top: 80px;
             border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        footer a {
+            margin: 0 10px;
         }
 
         /* Animation Keyframes */
@@ -254,8 +306,16 @@
                 text-align: center;
                 gap: 30px;
             }
-            .nav-links { display: none; } /* Could add a hamburger menu, but kept simple */
+            .nav-links { 
+                display: flex;
+                flex-wrap: wrap;
+            }
+            .nav-links a {
+                margin-left: 15px;
+                font-size: 0.85rem;
+            }
             .profile-img img { width: 180px; height: 180px; }
+            .hero h1 { font-size: 2rem; }
         }
     </style>
 </head>
@@ -268,26 +328,37 @@
             <div class="nav-links">
                 <a href="#about">About</a>
                 <a href="#research">Research</a>
-                <a href="#teaching">Teaching</a>
-                <a href="CV_Filename.pdf" target="_blank">CV</a>
+                <a href="https://www.sitingesteelu.com/CV_Siting__Estee__Lu.pdf" target="_blank">CV</a>
+                <a href="https://scholar.google.com/citations?user=oxabXHwAAAAJ&hl=en" target="_blank">Google Scholar</a>
             </div>
         </nav>
+
+        <!-- Google Site Highlight -->
+        <div class="google-site-highlight">
+            <h3>📚 Visit My Full Academic Profile</h3>
+            <p>For comprehensive information about my research, publications, and academic activities</p>
+            <a href="https://sites.google.com/view/siting-estee-lu" class="google-site-link" target="_blank">
+                View Google Site Homepage →
+            </a>
+        </div>
 
         <header class="hero" id="about">
             <div class="hero-text">
                 <h1>Hi, I'm Siting.</h1>
                 <p>
-                    I am a PhD Candidate in Economics at the <strong>University of Edinburgh</strong>. 
+                    I am currently a <strong>Stipendiary Fellow</strong> at the <strong>University of Edinburgh</strong>. I obtained my PhD in Economics from the University of Edinburgh in September 2025, supervised by <a href="https://sites.google.com/view/edhopkins-economics" target="_blank" style="color: var(--accent-color);">Prof Ed Hopkins</a> and <a href="https://sites.google.com/site/axelgottfries/" target="_blank" style="color: var(--accent-color);">Dr Axel Gottfries</a>.
                     <br><br>
-                    My research focuses on <strong>Behavioural Economics</strong> and <strong>Search & Matching theory</strong>, specifically exploring how bounded rationality impacts labour markets.
+                    My research interests include <strong>behavioural economics, game theory, adaptive learning, searching and matching</strong>. I am particularly interested in the impact of bounded rationality or imperfect cognition on the matching market. I am also interested in the applications of <strong>Large Language Models in economic games and human-AI interactions</strong>.
+                    <br><br>
+                    <strong>I am on the Job Market for 2025-2026 and available for interviews!</strong>
                 </p>
                 <div class="hero-buttons">
                     <a href="#research" class="btn-primary">View Research</a>
-                    <a href="mailto:your.email@ed.ac.uk" class="btn-secondary">Contact Me</a>
+                    <a href="mailto:estee.l828@gmail.com" class="btn-secondary">Contact Me</a>
                 </div>
             </div>
             <div class="profile-img">
-                <img src="https://via.placeholder.com/400" alt="Siting Estee Lu">
+                <img src="https://www.sitingesteelu.com/Photo Estee Lu.JPG" alt="Siting Estee Lu">
             </div>
         </header>
 
@@ -296,48 +367,32 @@
 
             <div class="paper-card">
                 <span class="jmp-tag">Job Market Paper</span>
-                <a href="papers/JMP.pdf" class="paper-title">Costly Job Search with Inattentive Workers</a>
+                <a href="https://www.sitingesteelu.com/papers/Costly_Job_Search_with_Inattentive_Workers_Siting__Estee__Lu.pdf" class="paper-title" target="_blank">Costly Job Search with Inattentive Workers</a>
                 <div class="paper-meta">Single authored</div>
                 <p class="abstract">
-                    Labour market mismatch often arises from workers having limited attention. This paper proposes a Generalized Partially Directed Search model to analyze how cognitive constraints affect equilibrium unemployment...
+                    Labour market mismatch can arise from workers having limited attention. This paper proposes a Generalized Partially Directed Search model, extending on existing literature by allowing inattentive workers to have diverse priors and heterogeneous attention costs. I show that mismatch can be inherited from bias in workers' default search strategies, and heterogeneous attention costs could contribute to greater variability in the equilibrium outcomes. I also explore equilibrium multiplicity that was not adequately accounted for in previous studies. Equilibria where workers adopt different application strategies may generate both higher market efficiency and lower monopsony power than when workers employ the same application strategies.
                 </p>
-                <a href="papers/JMP.pdf" class="download-link">Download PDF &rarr;</a>
+                <a href="https://www.sitingesteelu.com/papers/Costly_Job_Search_with_Inattentive_Workers_Siting__Estee__Lu.pdf" class="download-link" target="_blank">Download PDF &rarr;</a>
             </div>
 
             <div class="paper-card">
-                <a href="papers/paper2.pdf" class="paper-title">Evolution of Labour Market Mismatch</a>
-                <div class="paper-meta">Working Paper, 2025</div>
+                <a href="https://sites.google.com/view/siting-estee-lu" class="paper-title" target="_blank">Additional Research Papers</a>
+                <div class="paper-meta">Working Papers & Publications</div>
                 <p class="abstract">
-                    An analysis of adaptive learning with experience in matching markets. We explore how agents update their beliefs over time...
+                    Please visit my Google Site homepage for a complete list of my working papers, publications, and ongoing research projects in behavioural economics, adaptive learning, and LLM applications in game theory.
                 </p>
-                <a href="papers/paper2.pdf" class="download-link">Download PDF &rarr;</a>
-            </div>
-
-            <div class="paper-card">
-                <a href="#" class="paper-title">Game-theory behaviour of large language models</a>
-                <div class="paper-meta">Published in <em>Economics and Business Review</em>, 2025</div>
-                <p class="abstract">
-                   Investigating the strategic capabilities of LLMs in Keynesian beauty contests.
-                </p>
-                <a href="#" class="download-link">View Publication &rarr;</a>
-            </div>
-        </section>
-
-        <section id="teaching">
-            <h2 class="section-title">Teaching</h2>
-            <div style="line-height: 1.8;">
-                <p><strong>ECNM11043: Econometrics 1 (Postgraduate)</strong><br>
-                <span style="color:var(--text-muted)">Teaching Assistant, 2025</span></p>
-                
-                <p><strong>ECNM10070: Topics in Microeconomics</strong><br>
-                <span style="color:var(--text-muted)">Teaching Assistant, 2025</span></p>
-
-                <p><strong>ECNM10066: Behavioural Economics</strong><br>
-                <span style="color:var(--text-muted)">Teaching Assistant, 2022-2024</span></p>
+                <a href="https://sites.google.com/view/siting-estee-lu" class="download-link" target="_blank">View All Research &rarr;</a>
             </div>
         </section>
 
         <footer>
+            <div style="margin-bottom: 15px;">
+                <a href="https://sites.google.com/view/siting-estee-lu" target="_blank">Google Site</a>
+                <a href="https://scholar.google.com/citations?user=oxabXHwAAAAJ&hl=en" target="_blank">Google Scholar</a>
+                <a href="https://www.linkedin.com/in/siting-estee-lu/" target="_blank">LinkedIn</a>
+                <a href="https://x.com/EsteeLu" target="_blank">Twitter/X</a>
+                <a href="mailto:estee.l828@gmail.com">Email</a>
+            </div>
             &copy; 2025 Siting Estee Lu. University of Edinburgh.
         </footer>
 

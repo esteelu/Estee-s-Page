@@ -1353,7 +1353,7 @@ Make it detailed and visually rich with gradients in <defs>.`;
 
     try {
       const res = await fetch(
-        'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2',
+        'https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta',
         {
           method: 'POST',
           headers: {
@@ -1372,6 +1372,8 @@ Make it detailed and visually rich with gradients in <defs>.`;
       );
 
       const data = await res.json();
+
+      console.log(data);
 
       // HF returns an array
       let svgCode = data[0]?.generated_text || '';

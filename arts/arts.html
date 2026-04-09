@@ -1323,12 +1323,12 @@
   }
 
    // ─── Art Generation ───
- async function generateArt() {
+async function generateArt() {
     const prompt = document.getElementById('prompt-input').value.trim();
     const style = document.getElementById('style-select').value;
     if (!prompt) return;
 
-    const HF_TOKEN = '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'; // get free at huggingface.co/settings/tokens
+    const OPENAI_KEY = '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';
 
     const btn = document.getElementById('gen-btn');
     const status = document.getElementById('canvas-status');
@@ -1349,38 +1349,32 @@ No explanation, no markdown, no code fences. Just raw SVG.
 Style: ${style}.
 Make it detailed and visually rich with gradients in <defs>.`;
 
-    const fullPrompt = `<|system|>${systemPrompt}</s><|user|>Create SVG artwork for: "${prompt}"</s><|assistant|>`;
+    try {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENAI_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          max_tokens: 3000,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: `Create SVG artwork for: "${prompt}". Style: ${style}. Return ONLY the SVG code.` }
+          ]
+        })
+      });
 
-try {
-      const res = await fetch(
-        'https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta',
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${HF_TOKEN}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            inputs: fullPrompt,
-            parameters: {
-              max_new_tokens: 2000,
-              return_full_text: false,
-              temperature: 0.7
-            }
-          })
-        }
-      );
-
-      // Show the raw status code
       if (!res.ok) {
         const errText = await res.text();
         throw new Error(`HTTP ${res.status}: ${errText}`);
       }
 
       const data = await res.json();
-      console.log('HF response:', data);
+      console.log('OpenAI response:', data);
 
-      let svgCode = data[0]?.generated_text || '';
+      let svgCode = data.choices?.[0]?.message?.content || '';
       svgCode = svgCode.replace(/```svg|```xml|```/g, '').trim();
       const svgMatch = svgCode.match(/<svg[\s\S]*<\/svg>/i);
       svgCode = svgMatch ? svgMatch[0] : svgCode;
@@ -1395,8 +1389,20 @@ try {
         }
         addMsg('ai', '✦ Artwork rendered — ' + style);
       } else {
-        throw new Error('No SVG found in response. Raw output: ' + svgCode.substring(0, 200));
+        throw new Error('No SVG found. Raw: ' + svgCode.substring(0, 200));
       }
+
+    } catch (err) {
+      output.innerHTML = `<div style="text-align:center;padding:2rem;">
+        <p style="font-size:0.8rem;color:rgba(232,80,80,0.7);">Generation failed.</p>
+        <p style="font-size:0.72rem;color:rgba(184,180,170,0.35);margin-top:8px;">${err.message}</p>
+      </div>`;
+      addMsg('ai', '⚠ Generation failed — ' + err.message);
+    } finally {
+      btn.disabled = false;
+      status.classList.remove('visible');
+    }
+  }
 
   // Keyboard shortcut
   document.getElementById('prompt-input').addEventListener('keydown', e => {

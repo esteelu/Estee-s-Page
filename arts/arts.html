@@ -1322,11 +1322,13 @@
     hist.scrollTop = hist.scrollHeight;
   }
 
-  // ─── Generate Art ───
-  async function generateArt() {
+   // ─── Art Generation ───
+ async function generateArt() {
     const prompt = document.getElementById('prompt-input').value.trim();
     const style = document.getElementById('style-select').value;
     if (!prompt) return;
+
+    const HF_TOKEN = 'YOUR_HF_TOKEN_HERE'; // get free at huggingface.co/settings/tokens
 
     const btn = document.getElementById('gen-btn');
     const status = document.getElementById('canvas-status');
@@ -1337,44 +1339,50 @@
     addMsg('user', prompt);
 
     output.innerHTML = `<div style="text-align:center;padding:3rem;">
-      <div class="spinner active" id="spin" style="margin:0 auto 1rem;"></div>
-      <p style="font-size:0.78rem;color:rgba(184,180,170,0.4);font-style:italic;">Claude is rendering your artwork…</p>
+      <div id="spin" style="width:40px;height:40px;border:2px solid rgba(0,245,212,0.1);border-top-color:#4db6b4;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;"></div>
+      <p style="font-size:0.78rem;color:rgba(184,180,170,0.4);font-style:italic;">Generating your artwork…</p>
     </div>`;
 
-    // inject spinner css since it may not be in scope here
-    const sp = document.getElementById('spin');
-    if (sp) {
-      sp.style.cssText = 'width:40px;height:40px;border:2px solid rgba(0,245,212,0.1);border-top-color:#4db6b4;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;';
-    }
+    const systemPrompt = `You are an SVG artist. Generate ONLY valid SVG code, nothing else.
+Rules: start with <svg viewBox="0 0 600 450" xmlns="http://www.w3.org/2000/svg">, end with </svg>.
+No explanation, no markdown, no code fences. Just raw SVG.
+Style: ${style}.
+Make it detailed and visually rich with gradients in <defs>.`;
 
-    const systemPrompt = `You are an expert SVG artist who generates beautiful, detailed SVG artwork. 
-When given an art description, you respond with ONLY a valid SVG element (starting with <svg and ending with </svg>).
-The SVG must be exactly 600x450 viewBox, use viewBox="0 0 600 450".
-Create rich, detailed artwork with appropriate colors, shapes, gradients (using <defs>), and visual complexity.
-The art style requested is: ${style}.
-Respond with ONLY the SVG code, nothing else — no explanation, no markdown fences, just the raw SVG.`;
+    const fullPrompt = `<s>[INST] ${systemPrompt}\n\nCreate SVG artwork for: "${prompt}" [/INST]`;
 
-<script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@latest/dist/transformers.min.js"></script>
-<script>
-async function generateSVG(prompt) {
-  const tokenizer = await window.transformers.AutoTokenizer.from_pretrained('gpt2');
-  const model = await window.transformers.AutoModelForCausalLM.from_pretrained('gpt2');
-
-  const inputIds = tokenizer.encode(`Create SVG for: ${prompt}`);
-  const outputIds = await model.generate(inputIds, { max_new_tokens: 100 });
-  const text = tokenizer.decode(outputIds);
-
-  console.log(text); // you can parse or display SVG
-}
-</script>
+    try {
+      const res = await fetch(
+        'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${HF_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            inputs: fullPrompt,
+            parameters: {
+              max_new_tokens: 2000,
+              return_full_text: false,
+              temperature: 0.7
+            }
+          })
+        }
+      );
 
       const data = await res.json();
-      let svgCode = data.content?.[0]?.text || '';
 
-      // Strip any accidental markdown fences
+      // HF returns an array
+      let svgCode = data[0]?.generated_text || '';
+
+      // Strip markdown fences if present
       svgCode = svgCode.replace(/```svg|```xml|```/g, '').trim();
 
-      // Ensure we have a valid SVG
+      // Extract just the SVG block in case there's extra text
+      const svgMatch = svgCode.match(/<svg[\s\S]*<\/svg>/i);
+      svgCode = svgMatch ? svgMatch[0] : svgCode;
+
       if (svgCode.startsWith('<svg')) {
         output.innerHTML = svgCode;
         const svgEl = output.querySelector('svg');
@@ -1385,11 +1393,12 @@ async function generateSVG(prompt) {
         }
         addMsg('ai', '✦ Artwork rendered — ' + style);
       } else {
-        throw new Error('Invalid SVG response');
+        throw new Error('Model did not return valid SVG — try a more specific prompt');
       }
+
     } catch (err) {
       output.innerHTML = `<div style="text-align:center;padding:2rem;">
-        <p style="font-size:0.8rem;color:rgba(232,80,80,0.7);">Generation failed. Check your network or API connection.</p>
+        <p style="font-size:0.8rem;color:rgba(232,80,80,0.7);">Generation failed.</p>
         <p style="font-size:0.72rem;color:rgba(184,180,170,0.35);margin-top:8px;">${err.message}</p>
       </div>`;
       addMsg('ai', '⚠ Generation failed — ' + err.message);

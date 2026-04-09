@@ -1351,7 +1351,7 @@ Make it detailed and visually rich with gradients in <defs>.`;
 
     const fullPrompt = `<|system|>${systemPrompt}</s><|user|>Create SVG artwork for: "${prompt}"</s><|assistant|>`;
 
-    try {
+try {
       const res = await fetch(
         'https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta',
         {
@@ -1371,17 +1371,17 @@ Make it detailed and visually rich with gradients in <defs>.`;
         }
       );
 
+      // Show the raw status code
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`HTTP ${res.status}: ${errText}`);
+      }
+
       const data = await res.json();
+      console.log('HF response:', data);
 
-      console.log(data);
-
-      // HF returns an array
       let svgCode = data[0]?.generated_text || '';
-
-      // Strip markdown fences if present
       svgCode = svgCode.replace(/```svg|```xml|```/g, '').trim();
-
-      // Extract just the SVG block in case there's extra text
       const svgMatch = svgCode.match(/<svg[\s\S]*<\/svg>/i);
       svgCode = svgMatch ? svgMatch[0] : svgCode;
 
@@ -1395,20 +1395,8 @@ Make it detailed and visually rich with gradients in <defs>.`;
         }
         addMsg('ai', '✦ Artwork rendered — ' + style);
       } else {
-        throw new Error('Model did not return valid SVG — try a more specific prompt');
+        throw new Error('No SVG found in response. Raw output: ' + svgCode.substring(0, 200));
       }
-
-    } catch (err) {
-      output.innerHTML = `<div style="text-align:center;padding:2rem;">
-        <p style="font-size:0.8rem;color:rgba(232,80,80,0.7);">Generation failed.</p>
-        <p style="font-size:0.72rem;color:rgba(184,180,170,0.35);margin-top:8px;">${err.message}</p>
-      </div>`;
-      addMsg('ai', '⚠ Generation failed — ' + err.message);
-    } finally {
-      btn.disabled = false;
-      status.classList.remove('visible');
-    }
-  }
 
   // Keyboard shortcut
   document.getElementById('prompt-input').addEventListener('keydown', e => {

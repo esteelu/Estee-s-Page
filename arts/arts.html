@@ -1349,7 +1349,7 @@ No explanation, no markdown, no code fences. Just raw SVG.
 Style: ${style}.
 Make it detailed and visually rich with gradients in <defs>.`;
 
-    const fullPrompt = `<s>[INST] ${systemPrompt}\n\nCreate SVG artwork for: "${prompt}" [/INST]`;
+    const fullPrompt = `<|system|>${systemPrompt}</s><|user|>Create SVG artwork for: "${prompt}"</s><|assistant|>`;
 
     try {
       const res = await fetch(

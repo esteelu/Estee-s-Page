@@ -1141,69 +1141,88 @@
   </div>
 </div>
 
-<!-- ─── AI STUDIO ─── -->
+<!-- ─── SVG PROCESS SECTION ─── -->
 <section id="studio" class="ai-studio fade-in">
   <div class="studio-header">
-    <div class="eyebrow">Interactive — AI Art Generator</div>
-    <h2>Describe it. Watch it <span>materialise.</span></h2>
-    <p>Type an art description and let Claude render an SVG illustration in your chosen style. The AI interprets your prompt — no image API required, pure generative code.</p>
+    <div class="eyebrow">The Making Of</div>
+    <h2>How I work with <span>SVG &amp; AI</span></h2>
+    <p>All artwork on this site is built in SVG — Scalable Vector Graphics. Rather than pixels, SVG describes images as geometric instructions: lines, curves, gradients, and shapes assembled into scenes. I use AI to generate a first draft in SVG code, then rewrite and layer it by hand to add meaning the algorithm can't supply.</p>
   </div>
 
-  <div class="studio-layout">
-    <!-- CANVAS -->
-    <div class="canvas-panel" id="canvas-panel">
-      <div class="canvas-status" id="canvas-status">● Generating…</div>
-      <div id="art-output">
-        <div class="canvas-empty">
-          <div class="canvas-empty-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="3" y="3" width="18" height="18" rx="2" stroke="rgba(0,245,212,0.4)" stroke-width="1.2"/>
-              <path d="M3 15l5-5 4 4 3-3 6 6" stroke="rgba(0,245,212,0.4)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="8.5" cy="8.5" r="1.5" fill="rgba(0,245,212,0.4)"/>
-            </svg>
-          </div>
-          <p>Your AI-generated artwork will appear here. Enter a description and hit Generate.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:rgba(0,245,212,0.06);">
+
+    <!-- LEFT: What is SVG -->
+    <div style="background:#08080e;padding:3rem 2.5rem;">
+      <div style="font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--teal-light);margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;">What is SVG<span style="flex:1;height:1px;background:rgba(0,245,212,0.2);"></span></div>
+      <p style="font-size:0.875rem;line-height:1.85;color:var(--smoke);margin-bottom:1.5rem;">SVG is a file format that describes images as code rather than pixels. A circle, a gradient, a jagged skyline — all written as mathematical instructions that scale perfectly at any size.</p>
+      <p style="font-size:0.875rem;line-height:1.85;color:var(--smoke);margin-bottom:2rem;">Because it's code, AI can write it. I give the model a description, it returns SVG markup, and the browser renders it instantly — no image file needed.</p>
+      <div style="background:rgba(0,245,212,0.04);border:1px solid rgba(0,245,212,0.12);border-radius:4px;padding:1.25rem 1.5rem;">
+        <div style="font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal-light);margin-bottom:0.75rem;">Example SVG code</div>
+        <pre style="font-family:'DM Mono',monospace;font-size:0.72rem;color:rgba(184,180,170,0.6);line-height:1.7;overflow-x:auto;white-space:pre-wrap;">&lt;svg viewBox="0 0 400 300"&gt;
+  &lt;defs&gt;
+    &lt;radialGradient id="sky"&gt;
+      &lt;stop offset="0%" stop-color="#7c4dff"/&gt;
+      &lt;stop offset="100%" stop-color="#0e0c18"/&gt;
+    &lt;/radialGradient&gt;
+  &lt;/defs&gt;
+  &lt;rect fill="url(#sky)" width="400" height="300"/&gt;
+  &lt;rect x="40" y="180" width="60" height="120"
+        fill="#1a1428"/&gt;
+&lt;/svg&gt;</pre>
+      </div>
+    </div>
+
+    <!-- RIGHT: My prompts -->
+    <div style="background:#09090f;padding:3rem 2.5rem;">
+      <div style="font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--teal-light);margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;">Prompts I used<span style="flex:1;height:1px;background:rgba(0,245,212,0.2);"></span></div>
+      <p style="font-size:0.875rem;line-height:1.85;color:var(--smoke);margin-bottom:2rem;">These are the actual descriptions I gave the AI to generate the first-draft SVG for each piece in the gallery above. From there I edited the code by hand.</p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="border-left:2px solid rgba(200,146,42,0.4);padding:12px 16px;background:rgba(200,146,42,0.04);">
+          <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Factory Dreams in Violet</div>
+          <div style="font-size:0.8rem;color:var(--smoke);line-height:1.7;font-style:italic;">"A Victorian factory at dusk, smoky chimneys silhouetted against a deep purple sky, industrial sublime, dark and moody, SVG illustration style"</div>
+        </div>
+        <div style="border-left:2px solid rgba(200,146,42,0.4);padding:12px 16px;background:rgba(200,146,42,0.04);">
+          <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">The Dinner Party Cracks</div>
+          <div style="font-size:0.8rem;color:var(--smoke);line-height:1.7;font-style:italic;">"Belle Époque Parisian dinner party, opulent chandelier, wealthy figures in evening wear, warm golden candlelight, SVG illustration"</div>
+        </div>
+        <div style="border-left:2px solid rgba(200,146,42,0.4);padding:12px 16px;background:rgba(200,146,42,0.04);">
+          <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Valued at $99.99</div>
+          <div style="font-size:0.8rem;color:var(--smoke);line-height:1.7;font-style:italic;">"Abstract portrait of a human face dissolving into barcodes and consumer data, digital glitch aesthetic, cyan and dark blue palette, SVG"</div>
+        </div>
+        <div style="border-left:2px solid rgba(200,146,42,0.4);padding:12px 16px;background:rgba(200,146,42,0.04);">
+          <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Root System v2.4</div>
+          <div style="font-size:0.8rem;color:var(--smoke);line-height:1.7;font-style:italic;">"A tree whose roots are organic and whose upper branches become a circuit board, half-nature half-machine, teal circuit traces, SVG"</div>
         </div>
       </div>
     </div>
 
-    <!-- CONTROLS -->
-    <div class="control-panel">
-      <div class="control-label">Prompt Studio</div>
+  </div>
 
-      <div class="prompt-presets">
-        <button class="preset-chip" onclick="setPreset('A Victorian factory at sunset, workers silhouetted against furnace glow, industrial sublime')">Industrial Sublime</button>
-        <button class="preset-chip" onclick="setPreset('Belle Époque Parisian café, gas lamps, elegantly dressed figures, impressionist light')">Belle Époque</button>
-        <button class="preset-chip" onclick="setPreset('Abstract digital consumerism — barcodes, screens, and human faces dissolving into pixels')">Consumerism</button>
-        <button class="preset-chip" onclick="setPreset('A neural network becoming a forest, roots and nodes intertwined, half-organic half-digital')">AI Organic</button>
-        <button class="preset-chip" onclick="setPreset('Geometric art deco portrait with gold leaf and symmetrical patterns')">Art Deco</button>
-        <button class="preset-chip" onclick="setPreset('Expressionist cityscape at night, neon reflections in rain, solitary figure')">Expressionist City</button>
-      </div>
-
-      <div class="chat-history" id="chat-history"></div>
-
-      <div class="prompt-area">
-        <textarea class="prompt-input" id="prompt-input"
-          placeholder="Describe the artwork… e.g. 'A Bauhaus-inspired composition of industrial machinery and geometric forms in muted reds and blacks'"></textarea>
-
-        <div class="style-row">
-          <select class="style-select" id="style-select">
-            <option value="detailed SVG illustration">Detailed Illustration</option>
-            <option value="minimalist geometric SVG">Minimalist Geometric</option>
-            <option value="expressionist bold SVG with thick strokes">Expressionist</option>
-            <option value="art deco SVG with symmetry and gold tones">Art Deco</option>
-            <option value="impressionistic SVG with soft shapes and dabs">Impressionistic</option>
-            <option value="cyberpunk neon SVG on dark background">Cyberpunk Neon</option>
-            <option value="abstract constructivist SVG">Constructivist Abstract</option>
-          </select>
-        </div>
-
-        <button class="generate-btn" id="gen-btn" onclick="generateArt()">
-          ↳ Generate Artwork
-        </button>
-      </div>
+  <!-- Process steps -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(0,245,212,0.06);margin-top:2px;">
+    <div style="background:#08080e;padding:2rem;">
+      <div style="font-family:'DM Mono',monospace;font-size:2rem;color:rgba(0,245,212,0.12);font-weight:500;line-height:1;margin-bottom:1rem;">01</div>
+      <div style="font-size:0.8rem;font-weight:500;color:var(--teal-light);margin-bottom:0.5rem;">Write a prompt</div>
+      <div style="font-size:0.78rem;color:var(--dust);line-height:1.7;">Describe the scene, era, mood, and style you want the AI to interpret.</div>
+    </div>
+    <div style="background:#08080e;padding:2rem;">
+      <div style="font-family:'DM Mono',monospace;font-size:2rem;color:rgba(0,245,212,0.12);font-weight:500;line-height:1;margin-bottom:1rem;">02</div>
+      <div style="font-size:0.8rem;font-weight:500;color:var(--teal-light);margin-bottom:0.5rem;">AI generates SVG</div>
+      <div style="font-size:0.78rem;color:var(--dust);line-height:1.7;">The model returns raw SVG code — shapes, gradients, and paths assembled into a first draft.</div>
+    </div>
+    <div style="background:#08080e;padding:2rem;">
+      <div style="font-family:'DM Mono',monospace;font-size:2rem;color:rgba(0,245,212,0.12);font-weight:500;line-height:1;margin-bottom:1rem;">03</div>
+      <div style="font-size:0.8rem;font-weight:500;color:var(--teal-light);margin-bottom:0.5rem;">I edit by hand</div>
+      <div style="font-size:0.78rem;color:var(--dust);line-height:1.7;">I rewrite the code — breaking symmetry, adding tension, inserting elements the AI left out.</div>
+    </div>
+    <div style="background:#08080e;padding:2rem;">
+      <div style="font-family:'DM Mono',monospace;font-size:2rem;color:rgba(0,245,212,0.12);font-weight:500;line-height:1;margin-bottom:1rem;">04</div>
+      <div style="font-size:0.8rem;font-weight:500;color:var(--teal-light);margin-bottom:0.5rem;">Layer meaning</div>
+      <div style="font-size:0.78rem;color:var(--dust);line-height:1.7;">The final piece carries intent the algorithm couldn't supply — a tear, a crack, a circuit root.</div>
     </div>
   </div>
+
 </section>
 
 <!-- FOOTER -->
@@ -1305,109 +1324,6 @@
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.08 });
   document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
-
-  // ─── Preset chips ───
-  function setPreset(text) {
-    document.getElementById('prompt-input').value = text;
-    document.getElementById('prompt-input').focus();
-  }
-
-  // ─── Chat history helper ───
-  function addMsg(role, text) {
-    const hist = document.getElementById('chat-history');
-    const div = document.createElement('div');
-    div.className = 'msg ' + role;
-    div.textContent = text;
-    hist.appendChild(div);
-    hist.scrollTop = hist.scrollHeight;
-  }
-
-   // ─── Art Generation ───
-async function generateArt() {
-    const prompt = document.getElementById('prompt-input').value.trim();
-    const style = document.getElementById('style-select').value;
-    if (!prompt) return;
-
-    const OPENAI_KEY = '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';
-
-    const btn = document.getElementById('gen-btn');
-    const status = document.getElementById('canvas-status');
-    const output = document.getElementById('art-output');
-
-    btn.disabled = true;
-    status.classList.add('visible');
-    addMsg('user', prompt);
-
-    output.innerHTML = `<div style="text-align:center;padding:3rem;">
-      <div id="spin" style="width:40px;height:40px;border:2px solid rgba(0,245,212,0.1);border-top-color:#4db6b4;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;"></div>
-      <p style="font-size:0.78rem;color:rgba(184,180,170,0.4);font-style:italic;">Generating your artwork…</p>
-    </div>`;
-
-    const systemPrompt = `You are an SVG artist. Generate ONLY valid SVG code, nothing else.
-Rules: start with <svg viewBox="0 0 600 450" xmlns="http://www.w3.org/2000/svg">, end with </svg>.
-No explanation, no markdown, no code fences. Just raw SVG.
-Style: ${style}.
-Make it detailed and visually rich with gradients in <defs>.`;
-
-    try {
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENAI_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          max_tokens: 3000,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: `Create SVG artwork for: "${prompt}". Style: ${style}. Return ONLY the SVG code.` }
-          ]
-        })
-      });
-
-      if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(`HTTP ${res.status}: ${errText}`);
-      }
-
-      const data = await res.json();
-      console.log('OpenAI response:', data);
-
-      let svgCode = data.choices?.[0]?.message?.content || '';
-      svgCode = svgCode.replace(/```svg|```xml|```/g, '').trim();
-      const svgMatch = svgCode.match(/<svg[\s\S]*<\/svg>/i);
-      svgCode = svgMatch ? svgMatch[0] : svgCode;
-
-      if (svgCode.startsWith('<svg')) {
-        output.innerHTML = svgCode;
-        const svgEl = output.querySelector('svg');
-        if (svgEl) {
-          svgEl.style.maxWidth = '100%';
-          svgEl.style.maxHeight = '460px';
-          svgEl.style.borderRadius = '2px';
-        }
-        addMsg('ai', '✦ Artwork rendered — ' + style);
-      } else {
-        throw new Error('No SVG found. Raw: ' + svgCode.substring(0, 200));
-      }
-
-    } catch (err) {
-      output.innerHTML = `<div style="text-align:center;padding:2rem;">
-        <p style="font-size:0.8rem;color:rgba(232,80,80,0.7);">Generation failed.</p>
-        <p style="font-size:0.72rem;color:rgba(184,180,170,0.35);margin-top:8px;">${err.message}</p>
-      </div>`;
-      addMsg('ai', '⚠ Generation failed — ' + err.message);
-    } finally {
-      btn.disabled = false;
-      status.classList.remove('visible');
-    }
-  }
-
-  // Keyboard shortcut
-  document.getElementById('prompt-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) generateArt();
-  });
 </script>
 </body>
 </html>

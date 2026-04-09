@@ -1354,22 +1354,19 @@ Create rich, detailed artwork with appropriate colors, shapes, gradients (using 
 The art style requested is: ${style}.
 Respond with ONLY the SVG code, nothing else — no explanation, no markdown fences, just the raw SVG.`;
 
-try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': 'KEY',
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4000,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: `Create an SVG artwork for: "${prompt}". Style: ${style}. Return ONLY the SVG code.` }]
-        })
-      });
+<script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@latest/dist/transformers.min.js"></script>
+<script>
+async function generateSVG(prompt) {
+  const tokenizer = await window.transformers.AutoTokenizer.from_pretrained('gpt2');
+  const model = await window.transformers.AutoModelForCausalLM.from_pretrained('gpt2');
+
+  const inputIds = tokenizer.encode(`Create SVG for: ${prompt}`);
+  const outputIds = await model.generate(inputIds, { max_new_tokens: 100 });
+  const text = tokenizer.decode(outputIds);
+
+  console.log(text); // you can parse or display SVG
+}
+</script>
 
       const data = await res.json();
       let svgCode = data.content?.[0]?.text || '';

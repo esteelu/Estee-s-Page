@@ -6,422 +6,1125 @@
     <meta name="citation_publication_date" content="2024-11-08">
     <meta name="citation_publisher" content="sitingesteelu.com">
     <meta name="citation_pdf_url" content="https://www.sitingesteelu.com/papers/Costly_Job_Search_with_Inattentive_Workers_Siting__Estee__Lu.pdf">
-    <meta name="citation_abstract" content="Labour market mismatch can arise from workers having limited attention. This paper proposes a Generalized Partially Directed Search model, extending on existing literature by allowing inattentive workers to have diverse priors and heterogeneous attention costs. I show that mismatch can be inherited from bias in workers’ default search strategies, and heterogeneous attention costs could contribute to greater variability in the equilibrium outcomes. I also explore equilibrium multiplicity that was not adequately accounted for in previous studies. Equilibria where workers adopt different application strategies may generate both higher market efficiency and lower monopsony power than when workers employ the same application strategies. This information-theoretic approach to model job search offers new policy insights on the basis of attention.">
+    <meta name="citation_abstract" content="Labour market mismatch can arise from workers having limited attention. This paper proposes a Generalized Partially Directed Search model, extending on existing literature by allowing inattentive workers to have diverse priors and heterogeneous attention costs.">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Siting Estee Lu | Stipendiary Fellow in Economics</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
-        /* --- DESIGN VARIABLES --- */
         :root {
-            --bg-color: #faf9f6; /* Soft Off-White (Pearl) */
-            --card-bg: #ffffff;
-            --text-main: #2c3e50; /* Dark Slate Blue/Grey */
-            --text-muted: #64748b;
-            --accent-color: #8b3a3a; /* A sophisticated academic red/burgundy */
-            --accent-hover: #a94444;
-            --shadow: 0 4px 20px rgba(0,0,0,0.05);
+            --bg:          #f7f4ef;
+            --surface:     #ffffff;
+            --surface-2:   #f0ece4;
+            --ink:         #1c1c1e;
+            --ink-2:       #4a4a4f;
+            --ink-3:       #8e8e93;
+            --accent:      #7a3030;
+            --accent-light:#b85454;
+            --gold:        #c9a84c;
+            --border:      rgba(0,0,0,0.07);
+            --shadow-sm:   0 2px 12px rgba(0,0,0,0.06);
+            --shadow-md:   0 6px 28px rgba(0,0,0,0.09);
+            --r:           10px;
         }
 
-        /* --- GLOBAL STYLES --- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif; /* Clean body font */
-            line-height: 1.7;
-            margin: 0;
-            padding: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.75;
+            -webkit-font-smoothing: antialiased;
         }
 
-        h1, h2, h3 {
-            font-family: 'Lora', serif; /* Elegant heading font */
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-top: 0;
-        }
-
-        a {
-            color: var(--accent-color);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        a:hover {
-            color: var(--accent-hover);
+        /* ─── NOISE TEXTURE ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 860px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* --- NAVIGATION --- */
-        nav {
+        a { color: var(--accent); text-decoration: none; transition: color .2s; }
+        a:hover { color: var(--accent-light); }
+
+        h1, h2, h3, h4 { font-family: 'Lora', serif; font-weight: 500; color: var(--ink); }
+
+        /* ─── TOP BAR ─── */
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .topbar-inner {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 60px;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            margin-bottom: 60px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
-        .nav-name {
+        .topbar-name {
             font-family: 'Lora', serif;
-            font-weight: 600;
-            font-size: 1.2rem;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: .02em;
+            color: var(--ink);
         }
 
-        .nav-links a {
-            margin-left: 25px;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent-color);
-        }
-
-        /* --- HERO SECTION --- */
-        .hero {
+        .topbar-links {
             display: flex;
+            gap: 24px;
             align-items: center;
-            gap: 50px;
-            margin-bottom: 80px;
-            animation: fadeIn 1s ease-in;
         }
 
-        .hero-text {
-            flex: 2;
+        .topbar-links a {
+            font-size: .85rem;
+            font-weight: 500;
+            color: var(--ink-2);
+            letter-spacing: .02em;
+        }
+
+        .topbar-links a:hover { color: var(--accent); }
+
+        /* ─── HERO ─── */
+        .hero {
+            padding: 80px 0 70px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 60px;
+            align-items: center;
+            animation: fadeUp .8s ease both;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 5px 14px;
+            font-size: .78rem;
+            font-weight: 600;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .hero-eyebrow::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse 2s infinite;
         }
 
         .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            line-height: 1.2;
+            font-size: 3rem;
+            line-height: 1.15;
+            margin-bottom: 18px;
+            font-weight: 700;
         }
 
-        .hero p {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            margin-bottom: 25px;
+        .hero-sub {
+            font-size: 1.05rem;
+            color: var(--ink-2);
+            margin-bottom: 28px;
+            max-width: 540px;
         }
 
-        .hero-buttons a {
-            display: inline-block;
-            margin-right: 15px;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 0.9rem;
+        .hero-sub strong { color: var(--ink); font-weight: 600; }
+
+        .hero-cta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-size: .88rem;
             font-weight: 600;
+            transition: all .2s;
+            letter-spacing: .01em;
         }
 
-        .btn-primary {
-            background-color: var(--text-main);
+        .btn-dark {
+            background: var(--ink);
             color: #fff;
         }
-        .btn-primary:hover {
-            background-color: #000;
+        .btn-dark:hover { background: #000; color: #fff; }
+
+        .btn-outline {
+            border: 1.5px solid rgba(0,0,0,0.15);
+            color: var(--ink-2);
+        }
+        .btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+
+        .btn-accent {
+            background: var(--accent);
             color: #fff;
         }
+        .btn-accent:hover { background: var(--accent-light); color: #fff; }
 
-        .btn-secondary {
-            border: 1px solid #ddd;
-            color: var(--text-main);
-        }
-        .btn-secondary:hover {
-            border-color: var(--text-main);
-        }
-
-        .profile-img {
-            flex: 1;
-            text-align: center;
-        }
-
-        .profile-img img {
-            width: 220px;
-            height: 220px;
-            object-fit: cover;
+        .avatar {
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
-            box-shadow: var(--shadow);
-            border: 5px solid #fff;
+            object-fit: cover;
+            border: 4px solid var(--surface);
+            box-shadow: var(--shadow-md), 0 0 0 8px rgba(122,48,48,.06);
         }
 
-        /* --- SECTIONS --- */
-        section {
-            margin-bottom: 80px;
+        .hero-info-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 22px;
         }
 
-        .section-title {
-            font-size: 1.8rem;
-            margin-bottom: 30px;
-            position: relative;
-            display: inline-block;
-        }
-        
-        /* Decorative underline for titles */
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 40px;
-            height: 3px;
-            background: var(--accent-color);
-            margin-top: 8px;
-            opacity: 0.3;
+        .pill {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: .8rem;
+            color: var(--ink-2);
+            font-weight: 500;
         }
 
-        /* --- PAPER CARDS --- */
+        /* ─── SECTIONS ─── */
+        section { padding: 60px 0; border-top: 1px solid var(--border); }
+
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            margin-bottom: 36px;
+        }
+
+        .section-header h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+        }
+
+        .section-count {
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--ink-3);
+            background: var(--surface-2);
+            padding: 2px 10px;
+            border-radius: 50px;
+        }
+
+        /* ─── ALERTS / NEW BADGE ─── */
+        .alert-new {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1px solid #fde68a;
+            border-radius: var(--r);
+            padding: 18px 24px;
+            margin-bottom: 32px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .alert-new-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+        .alert-new-body { font-size: .9rem; color: #78350f; line-height: 1.6; }
+        .alert-new-body strong { display: block; margin-bottom: 2px; font-weight: 600; }
+        .alert-new-body a { color: #92400e; text-decoration: underline; }
+
+        /* ─── PAPER CARDS ─── */
         .paper-card {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            margin-bottom: 30px;
-            transition: transform 0.2s ease;
-            border: 1px solid rgba(0,0,0,0.02);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 28px 30px;
+            margin-bottom: 18px;
+            transition: box-shadow .2s, transform .2s;
         }
 
         .paper-card:hover {
-            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
 
-        .jmp-tag {
-            display: inline-block;
-            background-color: #eef2ff;
-            color: #4f46e5;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.75rem;
+        .paper-card + .paper-card { }
+
+        .paper-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+
+        .tag {
+            font-size: .72rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 10px;
+            letter-spacing: .06em;
+            padding: 3px 9px;
+            border-radius: 4px;
         }
+
+        .tag-jmp   { background: #eef2ff; color: #4338ca; }
+        .tag-pub   { background: #ecfdf5; color: #065f46; }
+        .tag-wp    { background: #fff7ed; color: #9a3412; }
+        .tag-idea  { background: #f5f3ff; color: #6d28d9; }
+        .tag-nonac { background: #f0fdf4; color: #166534; }
+        .tag-collab { background: #fdf4ff; color: #7e22ce; }
 
         .paper-title {
-            font-size: 1.3rem;
             font-family: 'Lora', serif;
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: var(--ink);
             display: block;
-            margin-bottom: 10px;
-            color: #1a1a1a;
+            margin-bottom: 6px;
+            line-height: 1.4;
         }
 
+        .paper-title:hover { color: var(--accent); }
+
         .paper-meta {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 15px;
+            font-size: .85rem;
+            color: var(--ink-3);
+            margin-bottom: 10px;
             font-style: italic;
         }
 
-        .abstract {
-            font-size: 0.95rem;
-            color: #444;
-            margin-bottom: 20px;
+        .paper-abstract {
+            font-size: .9rem;
+            color: var(--ink-2);
+            margin-bottom: 14px;
+            line-height: 1.7;
         }
 
-        .download-link {
-            font-size: 0.9rem;
+        .paper-abstract.collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .toggle-abstract {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-size: .82rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid transparent;
-        }
-        .download-link:hover {
-            border-bottom: 1px solid var(--accent-color);
-        }
-
-        /* --- GOOGLE SITE HIGHLIGHT BOX --- */
-        .google-site-highlight {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
-            margin-bottom: 40px;
-            color: white;
-            text-align: center;
-        }
-
-        .google-site-highlight h3 {
-            color: white;
+            cursor: pointer;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: .01em;
             margin-bottom: 12px;
-            font-size: 1.4rem;
+            display: block;
         }
 
-        .google-site-highlight p {
-            margin-bottom: 20px;
-            opacity: 0.95;
-            font-size: 1rem;
-        }
+        .paper-links { display: flex; flex-wrap: wrap; gap: 14px; }
 
-        .google-site-link {
-            display: inline-block;
-            background: white;
-            color: #667eea;
-            padding: 12px 28px;
-            border-radius: 30px;
+        .paper-link {
+            font-size: .82rem;
             font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            color: var(--accent);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border-bottom: 1px solid transparent;
+            transition: border-color .2s;
         }
 
-        .google-site-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-            color: #667eea;
+        .paper-link:hover { border-bottom-color: var(--accent); }
+
+        /* ─── RESEARCH DIVIDERS ─── */
+        .research-group-title {
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--ink-3);
+            padding: 14px 0 10px;
+            border-top: 1px dashed var(--border);
+            margin-top: 10px;
         }
 
-        /* --- FOOTER --- */
+        .research-group-title:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+
+        /* ─── TEACHING ─── */
+        .teaching-role {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .teaching-role-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 20px 24px;
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .teaching-role-icon {
+            width: 38px; height: 38px;
+            border-radius: 8px;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: .9rem;
+            flex-shrink: 0;
+        }
+
+        .teaching-role-title {
+            font-family: 'Lora', serif;
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+
+        .teaching-role-sub { font-size: .82rem; color: var(--ink-3); }
+
+        .teaching-courses { padding: 6px 0; }
+
+        .course-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border);
+            transition: background .15s;
+        }
+
+        .course-row:last-child { border-bottom: none; }
+        .course-row:hover { background: var(--surface-2); }
+
+        .course-code {
+            font-size: .75rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            color: var(--accent);
+            letter-spacing: .03em;
+            white-space: nowrap;
+        }
+
+        .course-name { font-size: .88rem; color: var(--ink); font-weight: 500; }
+        .course-level { font-size: .75rem; color: var(--ink-3); white-space: nowrap; }
+
+        .course-links-cell {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .resource-chip {
+            font-size: .72rem;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            color: var(--ink-2);
+            transition: all .15s;
+            white-space: nowrap;
+        }
+
+        .resource-chip:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* ─── TEACHING HIGHLIGHT BOX ─── */
+        .teaching-highlight {
+            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+            border: 1px solid #fecdd3;
+            border-radius: var(--r);
+            padding: 22px 26px;
+            margin-top: 20px;
+        }
+
+        .teaching-highlight-title {
+            font-family: 'Lora', serif;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #9f1239;
+        }
+
+        .teaching-highlight p {
+            font-size: .88rem;
+            color: #881337;
+            line-height: 1.65;
+        }
+
+        /* ─── AWARD BADGE ─── */
+        .award-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #fef9c3, #fef08a);
+            border: 1px solid #fde047;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: .85rem;
+            font-weight: 600;
+            color: #713f12;
+            margin-top: 16px;
+        }
+
+        /* ─── ODYSSEY ─── */
+        .odyssey-upcoming {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1px solid #bbf7d0;
+            border-radius: var(--r);
+            padding: 13px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .odyssey-upcoming-label {
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: #15803d;
+            white-space: nowrap;
+        }
+
+        .odyssey-upcoming-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .odyssey-upcoming-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: white;
+            border: 1px solid #bbf7d0;
+            border-radius: 50px;
+            padding: 4px 12px;
+            font-size: .8rem;
+        }
+
+        .odyssey-upcoming-name { color: #14532d; font-weight: 500; }
+        .odyssey-upcoming-where { color: #15803d; font-size: .74rem; }
+        .odyssey-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .odyssey-col {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            overflow: hidden;
+        }
+
+        .odyssey-col-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px;
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .odyssey-col-icon { font-size: 1rem; }
+
+        .odyssey-col-title {
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--ink-2);
+        }
+
+        .odyssey-entry {
+            display: flex;
+            flex-direction: column;
+            padding: 9px 18px;
+            border-bottom: 1px solid var(--border);
+            transition: background .12s;
+        }
+
+        .odyssey-entry:last-child { border-bottom: none; }
+        .odyssey-entry:hover { background: var(--surface-2); }
+
+        .odyssey-entry-name {
+            font-size: .82rem;
+            color: var(--ink);
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .odyssey-entry-where {
+            font-size: .74rem;
+            color: var(--ink-3);
+            margin-top: 1px;
+        }
+
+        @media (max-width: 700px) {
+            .odyssey-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ─── OTHER WRITINGS ─── */
+        .writing-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .writing-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 20px;
+            transition: box-shadow .2s, transform .2s;
+        }
+
+        .writing-card:hover { box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+
+        .writing-card-label {
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--ink-3);
+            margin-bottom: 6px;
+        }
+
+        .writing-card-title {
+            font-size: .9rem;
+            font-weight: 500;
+            color: var(--ink);
+            line-height: 1.4;
+        }
+
+        /* ─── FOOTER ─── */
         footer {
-            text-align: center;
-            font-size: 0.85rem;
-            color: var(--text-muted);
+            border-top: 1px solid var(--border);
             padding: 40px 0;
-            margin-top: 80px;
-            border-top: 1px solid rgba(0,0,0,0.05);
+            text-align: center;
         }
 
-        footer a {
-            margin: 0 10px;
-        }
+        .footer-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 14px; }
+        .footer-links a { font-size: .85rem; color: var(--ink-2); font-weight: 500; }
+        .footer-links a:hover { color: var(--accent); }
+        .footer-copy { font-size: .8rem; color: var(--ink-3); }
 
-        /* Animation Keyframes */
-        @keyframes fadeIn {
+        /* ─── ANIMATIONS ─── */
+        @keyframes fadeUp {
             from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            .hero {
-                flex-direction: column-reverse;
-                text-align: center;
-                gap: 30px;
-            }
-            .nav-links { 
-                display: flex;
-                flex-wrap: wrap;
-            }
-            .nav-links a {
-                margin-left: 15px;
-                font-size: 0.85rem;
-            }
-            .profile-img img { width: 180px; height: 180px; }
-            .hero h1 { font-size: 2rem; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: .4; }
+        }
+
+        /* ─── MOBILE ─── */
+        @media (max-width: 700px) {
+            .hero { grid-template-columns: 1fr; text-align: center; padding: 50px 0 50px; }
+            .hero .avatar { display: none; }
+            .hero h1 { font-size: 2.2rem; }
+            .hero-info-strip { justify-content: center; }
+            .hero-cta { justify-content: center; }
+            .topbar-links { gap: 12px; }
+            .topbar-links a { font-size: .78rem; }
+            .writing-grid { grid-template-columns: 1fr; }
+            .course-row { grid-template-columns: 1fr; gap: 4px; }
+            .course-links-cell { justify-content: flex-start; }
+            .timeline-item { grid-template-columns: auto 1fr; }
+            .timeline-meta { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        
-        <nav>
-            <div class="nav-name">Siting Estee Lu</div>
-            <div class="nav-links">
-                <a href="#about">About</a>
-                <a href="#research">Research</a>
-                <a href="#teaching">Teaching</a>
-                <a href="https://www.sitingesteelu.com/CV_Siting__Estee__Lu.pdf" target="_blank">CV</a>
-                <a href="https://scholar.google.com/citations?user=oxabXHwAAAAJ&hl=en" target="_blank">Google Scholar</a>
-            </div>
+<!-- ── TOP BAR ── -->
+<div class="topbar">
+    <div class="topbar-inner">
+        <span class="topbar-name">Siting Estee Lu</span>
+        <nav class="topbar-links">
+            <a href="#about">About</a>
+            <a href="#research">Research</a>
+            <a href="#teaching">Teaching</a>
+            <a href="#academic-odyssey">CV & Events</a>
+            <a href="https://www.sitingesteelu.com/CV_Siting__Estee__Lu.pdf" target="_blank">↗ CV</a>
         </nav>
+    </div>
+</div>
 
-        <header class="hero" id="about">
-            <div class="hero-text">
-                <h1>Hi, I'm Estee.</h1>
-                <p>
-                    I am currently a <strong>Stipendiary Fellow</strong> at the <strong>University of Edinburgh</strong>. I obtained my PhD in Economics from the University of Edinburgh in September 2025, supervised by <a href="https://sites.google.com/view/edhopkins-economics" target="_blank" style="color: var(--accent-color);">Prof Ed Hopkins</a> and <a href="https://sites.google.com/site/axelgottfries/" target="_blank" style="color: var(--accent-color);">Dr Axel Gottfries</a>.
-                    <br><br>
-                    My research interests include <strong>behavioural economics, game theory, adaptive learning, searching and matching</strong>. I am particularly interested in the impact of bounded rationality or imperfect cognition on the matching market. I am also interested in the applications of <strong>Large Language Models in economic games and human-AI interactions</strong>.
-                    <br><br>
-                    <strong>I am on the Job Market for 2025-2026 and available for interviews!</strong>
-                </p>
-                <div class="hero-buttons">
-                    <a href="#research" class="btn-primary">View Research</a>
-                    <a href="mailto:estee.l828@gmail.com" class="btn-secondary">Contact Me</a>
+<div class="container">
+
+    <!-- ── HERO ── -->
+    <header class="hero" id="about">
+        <div>
+            <div class="hero-eyebrow">Available for Interviews · Job Market 2025–26</div>
+            <h1>Hi, I'm Estee.</h1>
+            <p class="hero-sub">
+                I am currently a <strong>Stipendiary Fellow</strong> at the <strong>University of Edinburgh</strong>. I obtained my PhD in Economics from the University of Edinburgh in September 2025, supervised by <a href="https://sites.google.com/view/edhopkins-economics" target="_blank">Prof Ed Hopkins</a> and <a href="https://sites.google.com/site/axelgottfries/" target="_blank">Dr Axel Gottfries</a>. I visited <strong>Columbia University</strong> during Spring 2025.
+                <br><br>
+                My research interests include <strong>behavioural economics, game theory, adaptive learning, searching and matching</strong>. I am particularly interested in the impact of bounded rationality or imperfect cognition on the matching market. I am also interested in the applications of <strong>Large Language Models in economic games and human-AI interactions</strong>.
+            </p>
+            <div class="hero-cta">
+                <a href="#research" class="btn btn-dark">View Research</a>
+                <a href="https://www.sitingesteelu.com/CV_Siting__Estee__Lu.pdf" target="_blank" class="btn btn-accent">Download CV</a>
+                <a href="mailto:estee.l828@gmail.com" class="btn btn-outline">✉ Email Me</a>
+            </div>
+            <div class="hero-info-strip">
+                <span class="pill">🏛 University of Edinburgh</span>
+                <span class="pill">📍 Edinburgh, UK</span>
+                <span class="pill">🎓 PhD Economics 2025</span>
+            </div>
+        </div>
+        <img src="https://www.sitingesteelu.com/Photo Estee Lu.JPG" alt="Siting Estee Lu" class="avatar">
+    </header>
+
+    <!-- ── RESEARCH ── -->
+    <section id="research">
+        <div class="section-header">
+            <h2>Research</h2>
+            <span class="section-count">5 papers</span>
+        </div>
+
+        <!-- NEW alert -->
+        <div class="alert-new">
+            <span class="alert-new-icon">🎉</span>
+            <div class="alert-new-body">
+                <strong>Recent Updates</strong>
+                <b>New Working Paper:</b> <a href="https://www.sitingesteelu.com/papers/Large_Language_Models_can_Predict_Human_Strategic_Decisions.pdf" target="_blank">Large Language Models can Predict Human Strategic Decisions</a> (w/ Pedro González-Fernández &amp; Helena Normann)
+                &nbsp;·&nbsp;
+                <b>Published:</b> <a href="https://doi.org/10.18559/ebr.2025.2.2182" target="_blank">Game-theory behaviour of large language models: The case of Keynesian beauty contests</a> — <em>Economics and Business Review</em>, 11(2), 119–148.
+            </div>
+        </div>
+
+        <!-- JOB MARKET PAPER -->
+        <div class="research-group-title">Job Market Paper</div>
+        <div class="paper-card">
+            <div class="paper-tags">
+                <span class="tag tag-jmp">Job Market Paper</span>
+            </div>
+            <a href="https://www.sitingesteelu.com/papers/Costly_Job_Search_with_Inattentive_Workers_Siting__Estee__Lu.pdf" class="paper-title" target="_blank">Costly Job Search with Inattentive Workers</a>
+            <div class="paper-meta">Single authored &nbsp;·&nbsp; Labour Economics / Behavioural</div>
+            <p class="paper-abstract collapsed" id="abs-jmp">
+                Labour market mismatch can arise from workers having limited attention. This paper proposes a Generalized Partially Directed Search model, extending on existing literature by allowing inattentive workers to have diverse priors and heterogeneous attention costs. I show that mismatch can be inherited from bias in workers' default search strategies, and heterogeneous attention costs could contribute to greater variability in the equilibrium outcomes. I also explore equilibrium multiplicity that was not adequately accounted for in previous studies. Equilibria where workers adopt different application strategies may generate both higher market efficiency and lower monopsony power than when workers employ the same application strategies. This information-theoretic approach to model job search offers new policy insights on the basis of attention.
+            </p>
+            <button class="toggle-abstract" onclick="toggleAbstract(this,'abs-jmp')">Show full abstract ↓</button>
+            <div class="paper-links">
+                <a href="https://www.sitingesteelu.com/papers/Costly_Job_Search_with_Inattentive_Workers_Siting__Estee__Lu.pdf" target="_blank" class="paper-link">↓ Download PDF</a>
+            </div>
+        </div>
+
+        <!-- PUBLICATIONS -->
+        <div class="research-group-title">Publications</div>
+        <div class="paper-card">
+            <div class="paper-tags">
+                <span class="tag tag-pub">Published</span>
+                <span class="tag tag-collab">Co-authored</span>
+            </div>
+            <a href="https://doi.org/10.18559/ebr.2025.2.2182" class="paper-title" target="_blank">Game-theory behaviour of large language models: The case of Keynesian beauty contests</a>
+            <div class="paper-meta"><em>Economics and Business Review</em>, 11(2), 119–148 &nbsp;·&nbsp; 2025</div>
+            <p class="paper-abstract collapsed" id="abs-pub1">
+                The growing adoption of large language models (LLMs) presents potential for deeper understanding of human behaviours within game theory frameworks. This paper examines strategic interactions among multiple types of LLM-based agents in a classical beauty contest game. LLM-based agents demonstrate varying depth of reasoning that fall within a range of level-0 to 1, which are lower than experimental results conducted with human subjects in previous literature, but they display similar convergence patterns towards Nash Equilibrium choice in repeated settings. Through simulations that vary the group composition of agent types, environments with lower strategic uncertainty enhance convergence for LLM-based agents, and environments with mixed strategic types accelerate convergence for all. Results with simulated agents not only convey insights on potential human behaviours in competitive settings, they also offer valuable understanding of strategic interactions among algorithms.
+            </p>
+            <button class="toggle-abstract" onclick="toggleAbstract(this,'abs-pub1')">Show full abstract ↓</button>
+            <div class="paper-links">
+                <a href="https://doi.org/10.18559/ebr.2025.2.2182" target="_blank" class="paper-link">↗ Journal DOI</a>
+                <a href="https://arxiv.org/abs/2404.08492" target="_blank" class="paper-link">↗ arXiv Working Paper</a>
+            </div>
+        </div>
+
+        <!-- WORKING PAPERS -->
+        <div class="research-group-title">Working Papers</div>
+
+        <div class="paper-card">
+            <div class="paper-tags">
+                <span class="tag tag-wp">Working Paper</span>
+                <span class="tag tag-collab">Co-authored</span>
+            </div>
+            <a href="https://www.sitingesteelu.com/papers/Large_Language_Models_can_Predict_Human_Strategic_Decisions.pdf" class="paper-title" target="_blank">Large Language Models can Predict Human Strategic Decisions</a>
+            <div class="paper-meta">with <a href="https://www.pgonzalezfernandez.com/" target="_blank">Pedro González-Fernández</a> and Helena Normann</div>
+            <p class="paper-abstract collapsed" id="abs-wp1">
+                We study whether large language models (LLMs) can predict human strategic behavior from pre-play communication. Using three canonical laboratory games that vary in incentive alignment and communication structure, we provide LLMs and incentivized human forecasters with identical transcripts and ask them to predict players' subsequent actions. Using GPT-5 as our main model, we find that it consistently outperforms humans and achieves accuracy well above chance, especially when incentives are aligned and communication is bilateral. The performance gap arises almost entirely from correctly forecasting cooperative actions, while both humans and GPT-5 struggle to anticipate defection. These results suggest that strategic communication contains systematic information about future behavior that humans underutilize and that LLMs are able to exploit more effectively.
+            </p>
+            <button class="toggle-abstract" onclick="toggleAbstract(this,'abs-wp1')">Show full abstract ↓</button>
+            <div class="paper-links">
+                <a href="https://www.sitingesteelu.com/papers/Large_Language_Models_can_Predict_Human_Strategic_Decisions.pdf" target="_blank" class="paper-link">↓ Download PDF</a>
+            </div>
+        </div>
+
+        <div class="paper-card">
+            <div class="paper-tags">
+                <span class="tag tag-wp">Working Paper</span>
+            </div>
+            <a href="https://www.sitingesteelu.com/papers/Evolution_of_Labour_Market_Mismatch_through_Adaptive_Learning_with_Experience.pdf" class="paper-title" target="_blank">Learning to Coordinate: Adaptive Learning and Equilibrium Selection in Labour Market</a>
+            <div class="paper-meta">Single authored &nbsp;·&nbsp; Updated!</div>
+            <p class="paper-abstract collapsed" id="abs-wp2">
+                Workers' past application choices can act as heuristics for future decisions. By integrating learning theory into a search model, this work explores the role of experiences on workers' application choices. It provides an evolutionary perspective to labour market dynamics, and offers insights on equilibrium selection. I propose two market structures, where wages are unobservable and observable to workers, and model workers' application strategies over time using reinforcement learning and best response dynamics respectively. I show that in the presence of multiple equilibria, experience-based learning generally induces workers to coordinate on a more efficient, locally asymptotically stable equilibrium in which they apply with high probability to different firms, in both static and dynamic wage-setting environments. Learning models not only highlight potential mechanisms for equilibrium selection, they also suggest process-oriented policies to improve market efficiency.
+            </p>
+            <button class="toggle-abstract" onclick="toggleAbstract(this,'abs-wp2')">Show full abstract ↓</button>
+            <div class="paper-links">
+                <a href="https://www.sitingesteelu.com/papers/Evolution_of_Labour_Market_Mismatch_through_Adaptive_Learning_with_Experience.pdf" target="_blank" class="paper-link">↓ Download PDF</a>
+            </div>
+        </div>
+
+        <div class="paper-card">
+            <div class="paper-tags">
+                <span class="tag tag-wp">Working Paper</span>
+                <span class="tag tag-collab">Co-authored</span>
+            </div>
+            <a href="https://arxiv.org/abs/2401.01735" class="paper-title" target="_blank">Economics Arena for Large Language Models</a>
+            <div class="paper-meta">with Shangmin Guo, Haoran Bu, Haochuan Wang, Yi Ren, Dianbo Sui, Yuming Shang</div>
+            <p class="paper-abstract collapsed" id="abs-wp3">
+                Large language models (LLMs) have been extensively used as the backbones for general-purpose agents, and some economics literature suggests that LLMs are capable of playing various types of economics games. Following these works, to overcome the limitation of evaluating LLMs using static benchmarks, we propose to explore competitive games as an evaluation for LLMs to incorporate multi-players and dynamicise the environment. By varying the game history revealed to LLM-based players, we find that most LLMs are rational in that they play strategies that can increase their payoffs, but not as rational as indicated by Nash Equilibria. Moreover, when game history is available, certain types of LLMs, such as GPT-4, can converge faster to Nash Equilibrium strategies, suggesting a higher rationality level in comparison to other models. We provide an economics arena for the LLMs research community as a dynamic simulation to test rationality and strategic reasoning ability.
+            </p>
+            <button class="toggle-abstract" onclick="toggleAbstract(this,'abs-wp3')">Show full abstract ↓</button>
+            <div class="paper-links">
+                <a href="https://arxiv.org/abs/2401.01735" target="_blank" class="paper-link">↗ arXiv</a>
+            </div>
+        </div>
+
+        <div class="paper-card">
+            <div class="paper-tags">
+                <span class="tag tag-wp">Working Paper</span>
+            </div>
+            <a href="https://ideas.repec.org/p/pra/mprapa/102545.html" class="paper-title" target="_blank">Status Signalling with Luxury and Cultural Goods</a>
+            <div class="paper-meta">Single authored &nbsp;·&nbsp; Can books serve as signalling tools?</div>
+            <p class="paper-abstract collapsed" id="abs-wp4">
+                As the world shifts towards greater consumerism, there is an increasing tendency for individuals to distinguish themselves through the goods they purchase — which assert their taste and implicit social status. While the pursuit of social status has been well-explored, most studies focus on luxury consumption; limited research has investigated cultural goods (books, etiquette classes, etc.) as another signalling tool. This paper seeks to understand and provide a theoretical grounding for individuals' choices between status goods, and its implications for policy and social mobility. The choice to signal status through luxury or cultural goods is evaluated under two scenarios: when the wage-enhancing benefits of cultural goods are not revealed, and when they are. Individuals always prefer luxury goods in the first instance, but upon satisfying certain conditions, those endowed with high cultural and social capital may consume cultural goods instead. The paper proposes policy measures for a welfare-maximising social planner to drive greater consumption of cultural goods, which also has a positive impact on intergenerational mobility.
+            </p>
+            <button class="toggle-abstract" onclick="toggleAbstract(this,'abs-wp4')">Show full abstract ↓</button>
+            <div class="paper-links">
+                <a href="https://ideas.repec.org/p/pra/mprapa/102545.html" target="_blank" class="paper-link">↗ MPRA</a>
+            </div>
+        </div>
+
+
+
+    </section>
+
+    <!-- ── TEACHING ── -->
+    <section id="teaching">
+        <div class="section-header">
+            <h2>Teaching</h2>
+        </div>
+
+        <!-- AWARD -->
+        <div class="award-badge">
+            🏅 Shortlisted · Student Tutor of the Year, Teaching Awards 2024
+            &nbsp;<a href="https://www.teaching-matters-blog.ed.ac.uk/teaching-awards-2024-see-the-winners/" target="_blank" style="color:#713f12; text-decoration:underline; font-size:.8rem;">See winners</a>
+        </div>
+
+        <!-- STIPENDIARY FELLOW -->
+        <div class="teaching-role" style="margin-top:28px;">
+            <div class="teaching-role-header">
+                <div class="teaching-role-icon">✦</div>
+                <div>
+                    <div class="teaching-role-title">Stipendiary Fellow</div>
+                    <div class="teaching-role-sub">University of Edinburgh &nbsp;·&nbsp; 2025–2026</div>
                 </div>
             </div>
-            <div class="profile-img">
-                <img src="https://www.sitingesteelu.com/Photo Estee Lu.JPG" alt="Siting Estee Lu">
+            <div class="teaching-courses">
+                <div class="course-row">
+                    <span class="course-code">ECNM11043</span>
+                    <div>
+                        <div class="course-name">Econometrics 1</div>
+                        <div class="course-level">Postgraduate &nbsp;·&nbsp; 2025</div>
+                    </div>
+                    <div class="course-links-cell">
+                        <a href="https://drive.google.com/drive/folders/1mDEePfEbu0w4Ha1VjhrBiXlhk7jOJL1M?usp=sharing" target="_blank" class="resource-chip">Tutorial Notes '25</a>
+                        <a href="https://drive.google.com/file/d/1C9niLwsIjYv78LSdWI9_8sb7VJne9pcv/view?usp=sharing" target="_blank" class="resource-chip">Compact Summary</a>
+                    </div>
+                </div>
+                <div class="course-row">
+                    <span class="course-code">ECNM08013</span>
+                    <div>
+                        <div class="course-name">Economics 1</div>
+                        <div class="course-level">Year 1 Undergraduate &nbsp;·&nbsp; 2025</div>
+                    </div>
+                    <div class="course-links-cell">
+                        <a href="https://drive.google.com/drive/folders/1zhV_JhmlgbSXidikeLujwyzdu9LThNws?usp=sharing" target="_blank" class="resource-chip">Tutorial Slides '25 (Locked)</a>
+                    </div>
+                </div>
+                <div class="course-row">
+                    <span class="course-code">ECNM10070</span>
+                    <div>
+                        <div class="course-name">Topics in Microeconomics</div>
+                        <div class="course-level">Year 3 Undergraduate &nbsp;·&nbsp; 2025</div>
+                    </div>
+                    <div class="course-links-cell">
+                        <a href="https://drive.google.com/drive/folders/1OWB01uJXRyYYOjHkrtzu2qGWD1KFLd4E?usp=sharing" target="_blank" class="resource-chip">Tutorial Slides '25 (PW)</a>
+                    </div>
+                </div>
+                <div class="course-row">
+                    <span class="course-code">ECNM08013</span>
+                    <div>
+                        <div class="course-name">Economics 1 <span style="color:var(--accent);font-size:.78rem;">&nbsp;★ Lecturing Week 10</span></div>
+                        <div class="course-level">Year 1 Undergraduate &nbsp;·&nbsp; 2026</div>
+                    </div>
+                    <div class="course-links-cell">
+                        <a href="https://drive.google.com/drive/folders/1LPSdsfllUR__tAuf_O8hKAvsMpUkvoZ3?usp=sharing" target="_blank" class="resource-chip">Tutorial Slides '26 (Locked)</a>
+                        <a href="https://drive.google.com/file/d/1UaYJepQ0GJSbH6TnRX-n639CEvQCXCbC/view?usp=sharing" target="_blank" class="resource-chip">Lecture Slides</a>
+                    </div>
+                </div>
+                <div class="course-row">
+                    <span class="course-code">ECNM10090</span>
+                    <div>
+                        <div class="course-name">Experimental Economics</div>
+                        <div class="course-level">Year 3 Undergraduate &nbsp;·&nbsp; 2026</div>
+                    </div>
+                    <div class="course-links-cell">
+                        <a href="https://drive.google.com/file/d/1ncDwzC0rMUx0QdxNMwrwOzapYvETe3Wi/view?usp=sharing" target="_blank" class="resource-chip">How I Structure Tutorials '26</a>
+                    </div>
+                </div>
+                <div class="course-row">
+                    <span class="course-code">ECNM10066</span>
+                    <div>
+                        <div class="course-name">Behavioural Economics</div>
+                        <div class="course-level">Year 3 Undergraduate &nbsp;·&nbsp; 2026</div>
+                    </div>
+                    <div class="course-links-cell">
+                        <a href="https://drive.google.com/drive/folders/1MK0-53ryz3KIy-dF2uL9T2wj7aaQ9xS8?usp=sharing" target="_blank" class="resource-chip">Tutorial Slides '26 (PW)</a>
+                    </div>
+                </div>
             </div>
-        </header>
-
-        <section id="research">
-            <h2 class="section-title">Research</h2>
-
-            <div class="paper-card">
-                <span class="jmp-tag">Job Market Paper</span>
-                <a href="https://www.sitingesteelu.com/papers/Costly_Job_Search_with_Inattentive_Workers_Siting__Estee__Lu.pdf" class="paper-title" target="_blank">Costly Job Search with Inattentive Workers</a>
-                <div class="paper-meta">Single authored</div>
-                <p class="abstract">
-                    Labour market mismatch can arise from workers having limited attention. This paper proposes a Generalized Partially Directed Search model, extending on existing literature by allowing inattentive workers to have diverse priors and heterogeneous attention costs. I show that mismatch can be inherited from bias in workers' default search strategies, and heterogeneous attention costs could contribute to greater variability in the equilibrium outcomes. I also explore equilibrium multiplicity that was not adequately accounted for in previous studies. Equilibria where workers adopt different application strategies may generate both higher market efficiency and lower monopsony power than when workers employ the same application strategies.
-                </p>
-                <a href="https://www.sitingesteelu.com/papers/Costly_Job_Search_with_Inattentive_Workers_Siting__Estee__Lu.pdf" class="download-link" target="_blank">Download PDF &rarr;</a>
-            </div>
-
-            <div class="paper-card">
-                <a href="https://sites.google.com/view/siting-estee-lu" class="paper-title" target="_blank">Additional Research Papers</a>
-                <div class="paper-meta">Working Papers & Publications</div>
-                <p class="abstract">
-                    Please visit my Google Site homepage for a complete list of my working papers, publications, and ongoing research projects in behavioural economics, adaptive learning, and LLM applications in game theory.
-                </p>
-                <a href="https://sites.google.com/view/siting-estee-lu" class="download-link" target="_blank">View All Research &rarr;</a>
-            </div>
-            <div class="paper-card">
-                <span class="paper-title">NEW! 🎉 Research Updates</span>
-                <div class="paper-meta">Latest Working Papers & Publications</div>
-                <div class="abstract">
-                <p style="margin-bottom: 15px;">
-                    <strong>Working Paper:</strong> 
-                    <a href="https://www.sitingesteelu.com/papers/Large_Language_Models_can_Predict_Human_Strategic_Decisions.pdf" target="_blank" style="text-decoration: underline; color: inherit;">
-                        Large Language Models can Predict Human Strategic Decisions
-                    </a> 
-                    (w/ Pedro Gonzalez-Fernandez and Helena Normann)
-                </p>
-                <p>
-                    <strong>Recent Publication:</strong> 
-                    <a href="https://doi.org/10.18559/ebr.2025.2.2182" target="_blank" style="text-decoration: underline; color: inherit;">
-                        Game-theory behaviour of large language models: The case of Keynesian beauty contests.
-                    </a> 
-                    <em>Economics and Business Review</em>, 11(2), 119–148.
-                </p>
-            </div>
-            <a href="https://sites.google.com/view/siting-estee-lu" class="download-link" target="_blank">View All Research &rarr;</a>
         </div>
-        </section>
 
-        <section id="teaching">
-            <h2 class="section-title">Teaching</h2>
-            <div class="paper-card">
-                <p class="abstract" style="margin-bottom: 15px;">
-                    I have served as a Teaching Assistant for various courses at the University of Edinburgh, including graduate and undergraduate level econometrics, behavioural economics and topics in microeconomics courses.
-                </p>
-                <p class="abstract" style="margin-bottom: 0;">
-                    For a complete list of my teaching experience and responsibilities, please visit my <a href="https://sites.google.com/view/siting-estee-lu/teaching" target="_blank" style="font-weight: 600;">Teaching homepage</a>.
-                </p>
+        <!-- Teaching Exercise -->
+        <div class="paper-card" style="margin-bottom:24px;">
+            <div class="paper-tags"><span class="tag tag-jmp">Teaching Exercise</span></div>
+            <span class="paper-title" style="cursor:default;">Teaching Exercise — Micro Theory</span>
+            <div class="paper-meta">Contract Theory in Microeconomics &nbsp;·&nbsp; Job Market Teaching Sample</div>
+            <div class="paper-links">
+                <a href="https://drive.google.com/file/d/1IpYX0S9yVdF-b0ktWsJt568r5F0cY3dE/view?usp=sharing" target="_blank" class="paper-link">↗ Sample Slides</a>
             </div>
-        </section>
+        </div>
 
-        <footer>
-            <div style="margin-bottom: 15px;">
-                <a href="https://sites.google.com/view/siting-estee-lu" target="_blank">Google Site</a>
-                <a href="https://scholar.google.com/citations?user=oxabXHwAAAAJ&hl=en" target="_blank">Google Scholar</a>
-                <a href="https://www.linkedin.com/in/siting-estee-lu/" target="_blank">LinkedIn</a>
-                <a href="https://x.com/EsteeLu" target="_blank">Twitter/X</a>
-                <a href="mailto:estee.l828@gmail.com">Email</a>
+        <!-- TUTOR -->
+        <div class="teaching-role">
+            <div class="teaching-role-header">
+                <div class="teaching-role-icon" style="background:#4a4a4f;">◈</div>
+                <div>
+                    <div class="teaching-role-title">Tutor</div>
+                    <div class="teaching-role-sub">University of Edinburgh &nbsp;·&nbsp; 2020–2024</div>
+                </div>
             </div>
-            &copy; 2025 Siting Estee Lu. University of Edinburgh.
-        </footer>
+            <div class="teaching-courses">
+                <div class="course-row">
+                    <span class="course-code">ECNM08016</span>
+                    <div>
+                        <div class="course-name">Statistical Methods for Economics</div>
+                        <div class="course-level">Year 2 Undergraduate &nbsp;·&nbsp; 2024</div>
+                    </div>
+                    <div class="course-links-cell">
+                        <a href="https://drive.google.com/file/d/1E-2n5F49ogcT-2p4e8pN_PTNtig78ry9/view?usp=sharing" target="_blank" class="resource-chip">Summary Slides '24</a>
+                    </div>
+                </div>
+                <div class="course-row">
+                    <span class="course-code">ECNM10066</span>
+                    <div>
+                        <div class="course-name">Behavioural Economics</div>
+                        <div class="course-level">Year 3 Undergraduate &nbsp;·&nbsp; 2022, 2023, 2024</div>
+                    </div>
+                    <div class="course-links-cell">
+                        <a href="https://drive.google.com/file/d/1bS-vI37qr-BHPk0lzxTOdJ8To5lB_HQ2/view?usp=sharing" target="_blank" class="resource-chip">Summary Slides '24</a>
+                    </div>
+                </div>
+                <div class="course-row">
+                    <span class="course-code">ECNM08013</span>
+                    <div>
+                        <div class="course-name">Economics 1</div>
+                        <div class="course-level">Year 1 Undergraduate &nbsp;·&nbsp; 2021, 2023, 2024</div>
+                    </div>
+                    <div class="course-links-cell">
+                        <a href="https://drive.google.com/file/d/1IsMtPE0vbv9AF_qTPcq_fXr5eXk_shcb/view?usp=sharing" target="_blank" class="resource-chip">Summary Slides '24 (Sem 2)</a>
+                    </div>
+                </div>
+                <div class="course-row">
+                    <span class="course-code">ECNM08004</span>
+                    <div>
+                        <div class="course-name">Economic Principles</div>
+                        <div class="course-level">Year 1 Undergraduate &nbsp;·&nbsp; 2020</div>
+                    </div>
+                    <div class="course-links-cell"></div>
+                </div>
+            </div>
+        </div>
 
-    </div>
+        <!-- CLASSROOM EXERCISE HIGHLIGHT -->
+        <div class="teaching-highlight">
+            <div class="teaching-highlight-title">🍫 Reference Dependence Exercise in Tutorial</div>
+            <p>
+                As an unincentivised classroom exercise, roughly half of the students are randomly given chocolates. Students are then asked to report how much they would be willing to accept to sell the chocolate (if they received one) or how much they would be willing to pay to obtain one (if they did not). Having or not having the chocolate establishes the reference point from which students form their valuations — a live demonstration of the <strong>endowment effect</strong>.
+            </p>
+        </div>
+
+        <p style="font-size:.82rem; color:var(--ink-3); margin-top:14px;">
+            * For students accessing password-protected tutorial slides, please <a href="mailto:estee.l828@gmail.com">email me</a> if you encounter any issues.
+        </p>
+
+    </section>
+
+    <!-- ── ACADEMIC ODYSSEY ── -->
+    <section id="academic-odyssey">
+        <div class="section-header">
+            <h2>Academic Odyssey</h2>
+        </div>
+
+        <!-- UPCOMING -->
+        <div class="odyssey-upcoming">
+            <div class="odyssey-upcoming-label">📅 Upcoming</div>
+            <div class="odyssey-upcoming-items">
+                <div class="odyssey-upcoming-item">
+                    <span class="odyssey-upcoming-name">FUR Conference: Foundations of Utility and Risk</span>
+                    <span class="odyssey-upcoming-where">2026</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="odyssey-grid">
+
+            <!-- CONFERENCES -->
+            <div class="odyssey-col">
+                <div class="odyssey-col-header">
+                    <span class="odyssey-col-icon">🎤</span>
+                    <span class="odyssey-col-title">Conferences &amp; Workshops</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">EEA Congress</span>
+                    <span class="odyssey-entry-where">Bordeaux, France · 2025</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">ASFEE — French Association of Experimental Economics (15th)</span>
+                    <span class="odyssey-entry-where">Nancy, France · 2025</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">Language Gamification Workshop at NeurIPS</span>
+                    <span class="odyssey-entry-where">Vancouver, Canada · 2024</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">FUR Conference: Foundations of Utility and Risk</span>
+                    <span class="odyssey-entry-where">University of Queensland, Brisbane · 2024</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">SABE-IAREP Conference</span>
+                    <span class="odyssey-entry-where">Nice, France · 2023</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">10th Toulouse Economics and Biology Workshop</span>
+                    <span class="odyssey-entry-where">Toulouse, France · 2023</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">5th QMUL Economics &amp; Finance Workshop for PhD &amp; Postdocs</span>
+                    <span class="odyssey-entry-where">London, UK · 2023</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">SGPE PhD Conferences</span>
+                    <span class="odyssey-entry-where">Edinburgh, UK · 2021, 2023, 2024</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">15th Annual Symposium on Economic Theory, Policy &amp; Applications</span>
+                    <span class="odyssey-entry-where">Online · 2020</span>
+                </div>
+            </div>
+
+            <!-- SUMMER SCHOOLS -->
+            <div class="odyssey-col">
+                <div class="odyssey-col-header">
+                    <span class="odyssey-col-icon">☀️</span>
+                    <span class="odyssey-col-title">Summer Schools</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">Summer School in Experimental &amp; Behavioral Economics (EER)</span>
+                    <span class="odyssey-entry-where">University of Crete, Greece · 2024</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">Cognitive Foundations of Decision-Making</span>
+                    <span class="odyssey-entry-where">UM6P, Rabat, Morocco · 2024</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">Advanced School in Economic Theory: Imperfect Cognition (33rd)</span>
+                    <span class="odyssey-entry-where">Israel Institute for Advanced Studies, Jerusalem · 2023</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">Summer School of Computational &amp; Experimental Economics (2nd)</span>
+                    <span class="odyssey-entry-where">BESLab, Universitat Pompeu Fabra, Barcelona · 2023</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">Toulouse Summer School in Quantitative Social Sciences</span>
+                    <span class="odyssey-entry-where">TSE, Toulouse, France · 2023</span>
+                </div>
+                <div class="odyssey-entry">
+                    <span class="odyssey-entry-name">UEA Behavioral Game Theory Summer School</span>
+                    <span class="odyssey-entry-where">Online · 2022</span>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ── FOOTER ── -->
+    <footer>
+        <div class="footer-links">
+            <a href="https://sites.google.com/view/siting-estee-lu" target="_blank">Google Site</a>
+            <a href="https://scholar.google.com/citations?user=oxabXHwAAAAJ&hl=en" target="_blank">Google Scholar</a>
+            <a href="https://www.linkedin.com/in/siting-estee-lu/" target="_blank">LinkedIn</a>
+            <a href="https://x.com/EsteeLu" target="_blank">Twitter / X</a>
+            <a href="mailto:estee.l828@gmail.com">estee.l828@gmail.com</a>
+        </div>
+        <div class="footer-copy">&copy; 2025 Siting Estee Lu &nbsp;·&nbsp; University of Edinburgh</div>
+    </footer>
+
+</div>
+
+<script>
+    function toggleAbstract(btn, id) {
+        const el = document.getElementById(id);
+        if (el.classList.contains('collapsed')) {
+            el.classList.remove('collapsed');
+            btn.textContent = 'Hide abstract ↑';
+        } else {
+            el.classList.add('collapsed');
+            btn.textContent = 'Show full abstract ↓';
+        }
+    }
+</script>
 
 </body>
 </html>

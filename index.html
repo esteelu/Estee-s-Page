@@ -18,18 +18,18 @@
 
     <style>
         :root {
-            --bg:          #f7f4ef;
-            --surface:     #ffffff;
-            --surface-2:   #f0ece4;
-            --ink:         #1c1c1e;
-            --ink-2:       #4a4a4f;
-            --ink-3:       #8e8e93;
-            --accent:      #7a3030;
-            --accent-light:#b85454;
-            --gold:        #c9a84c;
-            --border:      rgba(0,0,0,0.07);
-            --shadow-sm:   0 2px 12px rgba(0,0,0,0.06);
-            --shadow-md:   0 6px 28px rgba(0,0,0,0.09);
+            --bg:          #0c0c0c;
+            --surface:     #161616;
+            --surface-2:   #1f1f1f;
+            --ink:         #f0ece6;
+            --ink-2:       #a8a49e;
+            --ink-3:       #5a5753;
+            --accent:      #c9a96e;
+            --accent-light:#e2c98a;
+            --gold:        #c9a96e;
+            --border:      rgba(255,255,255,0.07);
+            --shadow-sm:   0 2px 12px rgba(0,0,0,0.4);
+            --shadow-md:   0 6px 28px rgba(0,0,0,0.6);
             --r:           10px;
         }
 
@@ -182,12 +182,12 @@
 
         .btn-dark {
             background: var(--ink);
-            color: #fff;
+            color: #0c0c0c;
         }
-        .btn-dark:hover { background: #000; color: #fff; }
+        .btn-dark:hover { background: #fff; color: #0c0c0c; }
 
         .btn-outline {
-            border: 1.5px solid rgba(0,0,0,0.15);
+            border: 1.5px solid rgba(255,255,255,0.15);
             color: var(--ink-2);
         }
         .btn-outline:hover { border-color: var(--ink); color: var(--ink); }
@@ -250,8 +250,8 @@
 
         /* ─── ALERTS / NEW BADGE ─── */
         .alert-new {
-            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-            border: 1px solid #fde68a;
+            background: #1a1710;
+            border: 1px solid #3a3220;
             border-radius: var(--r);
             padding: 18px 24px;
             margin-bottom: 32px;
@@ -260,9 +260,9 @@
             align-items: flex-start;
         }
         .alert-new-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
-        .alert-new-body { font-size: .9rem; color: #78350f; line-height: 1.6; }
-        .alert-new-body strong { display: block; margin-bottom: 2px; font-weight: 600; }
-        .alert-new-body a { color: #92400e; text-decoration: underline; }
+        .alert-new-body { font-size: .9rem; color: #c9b97a; line-height: 1.6; }
+        .alert-new-body strong { display: block; margin-bottom: 2px; font-weight: 600; color: var(--accent); }
+        .alert-new-body a { color: var(--accent-light); text-decoration: underline; }
 
         /* ─── PAPER CARDS ─── */
         .paper-card {
@@ -292,12 +292,12 @@
             border-radius: 4px;
         }
 
-        .tag-jmp   { background: #eef2ff; color: #4338ca; }
-        .tag-pub   { background: #ecfdf5; color: #065f46; }
-        .tag-wp    { background: #fff7ed; color: #9a3412; }
-        .tag-idea  { background: #f5f3ff; color: #6d28d9; }
-        .tag-nonac { background: #f0fdf4; color: #166534; }
-        .tag-collab { background: #fdf4ff; color: #7e22ce; }
+        .tag-jmp   { background: #1a1a2e; color: #818cf8; }
+        .tag-pub   { background: #0d1f17; color: #4ade80; }
+        .tag-wp    { background: #1f1507; color: var(--accent); }
+        .tag-idea  { background: #1a0f2e; color: #a78bfa; }
+        .tag-nonac { background: #0d1f17; color: #4ade80; }
+        .tag-collab { background: #1f0f2e; color: #d8b4fe; }
 
         .paper-title {
             font-family: 'Lora', serif;
@@ -462,8 +462,8 @@
 
         /* ─── TEACHING HIGHLIGHT BOX ─── */
         .teaching-highlight {
-            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-            border: 1px solid #fecdd3;
+            background: #180f10;
+            border: 1px solid #2e1518;
             border-radius: var(--r);
             padding: 22px 26px;
             margin-top: 20px;
@@ -474,12 +474,12 @@
             font-size: 1rem;
             font-weight: 500;
             margin-bottom: 8px;
-            color: #9f1239;
+            color: #f9a8b0;
         }
 
         .teaching-highlight p {
             font-size: .88rem;
-            color: #881337;
+            color: #c9a0a6;
             line-height: 1.65;
         }
 
@@ -488,20 +488,20 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: linear-gradient(135deg, #fef9c3, #fef08a);
-            border: 1px solid #fde047;
+            background: #1a1507;
+            border: 1px solid #3a2e0a;
             border-radius: 6px;
             padding: 8px 16px;
             font-size: .85rem;
             font-weight: 600;
-            color: #713f12;
+            color: var(--accent);
             margin-top: 16px;
         }
 
         /* ─── ODYSSEY ─── */
         .odyssey-upcoming {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            border: 1px solid #bbf7d0;
+            background: #0d1a12;
+            border: 1px solid #1a3022;
             border-radius: var(--r);
             padding: 13px 18px;
             margin-bottom: 16px;
@@ -515,7 +515,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: .1em;
-            color: #15803d;
+            color: #4ade80;
             white-space: nowrap;
         }
 
@@ -530,15 +530,15 @@
             display: inline-flex;
             align-items: center;
             gap: 7px;
-            background: white;
-            border: 1px solid #bbf7d0;
+            background: #0d1a12;
+            border: 1px solid #1a3022;
             border-radius: 50px;
             padding: 4px 12px;
             font-size: .8rem;
         }
 
-        .odyssey-upcoming-name { color: #14532d; font-weight: 500; }
-        .odyssey-upcoming-where { color: #15803d; font-size: .74rem; }
+        .odyssey-upcoming-name { color: #a7f3c0; font-weight: 500; }
+        .odyssey-upcoming-where { color: #4ade80; font-size: .74rem; }
         .odyssey-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -656,7 +656,84 @@
             50%       { opacity: .4; }
         }
 
-        /* ─── MOBILE ─── */
+        /* ─── LIGHT THEME ─── */
+        [data-theme="light"] {
+            --bg:          #f7f4ef;
+            --surface:     #ffffff;
+            --surface-2:   #f0ece4;
+            --ink:         #1c1c1e;
+            --ink-2:       #4a4a4f;
+            --ink-3:       #8e8e93;
+            --accent:      #7a3030;
+            --accent-light:#b85454;
+            --gold:        #c9a84c;
+            --border:      rgba(0,0,0,0.07);
+            --shadow-sm:   0 2px 12px rgba(0,0,0,0.06);
+            --shadow-md:   0 6px 28px rgba(0,0,0,0.09);
+        }
+
+        [data-theme="light"] .alert-new {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-color: #fde68a;
+        }
+        [data-theme="light"] .alert-new-body { color: #78350f; }
+        [data-theme="light"] .alert-new-body strong { color: #92400e; }
+        [data-theme="light"] .alert-new-body a { color: #92400e; }
+
+        [data-theme="light"] .tag-jmp   { background: #eef2ff; color: #4338ca; }
+        [data-theme="light"] .tag-pub   { background: #ecfdf5; color: #065f46; }
+        [data-theme="light"] .tag-wp    { background: #fff7ed; color: #9a3412; }
+        [data-theme="light"] .tag-idea  { background: #f5f3ff; color: #6d28d9; }
+        [data-theme="light"] .tag-nonac { background: #f0fdf4; color: #166534; }
+        [data-theme="light"] .tag-collab { background: #fdf4ff; color: #7e22ce; }
+
+        [data-theme="light"] .award-badge {
+            background: linear-gradient(135deg, #fef9c3, #fef08a);
+            border-color: #fde047;
+            color: #713f12;
+        }
+        [data-theme="light"] .award-badge a { color: #713f12 !important; }
+
+        [data-theme="light"] .teaching-highlight {
+            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+            border-color: #fecdd3;
+        }
+        [data-theme="light"] .teaching-highlight-title { color: #9f1239; }
+        [data-theme="light"] .teaching-highlight p { color: #881337; }
+
+        [data-theme="light"] .odyssey-upcoming {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-color: #bbf7d0;
+        }
+        [data-theme="light"] .odyssey-upcoming-label { color: #15803d; }
+        [data-theme="light"] .odyssey-upcoming-item { background: white; border-color: #bbf7d0; }
+        [data-theme="light"] .odyssey-upcoming-name { color: #14532d; }
+        [data-theme="light"] .odyssey-upcoming-where { color: #15803d; }
+
+        [data-theme="light"] .btn-dark { background: var(--ink); color: #fff; }
+        [data-theme="light"] .btn-dark:hover { background: #000; color: #fff; }
+        [data-theme="light"] .btn-outline { border-color: rgba(0,0,0,0.15); }
+
+        /* ─── THEME TOGGLE BUTTON ─── */
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            color: var(--ink-2);
+            font-size: .78rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            padding: 5px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all .2s;
+            letter-spacing: .02em;
+        }
+        .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+        .theme-toggle-icon { font-size: .85rem; transition: transform .4s ease; }
+        .theme-toggle:hover .theme-toggle-icon { transform: rotate(20deg); }
         @media (max-width: 700px) {
             .hero { grid-template-columns: 1fr; text-align: center; padding: 50px 0 50px; }
             .hero .avatar { display: none; }
@@ -683,8 +760,11 @@
             <a href="#about">About</a>
             <a href="#research">Research</a>
             <a href="#teaching">Teaching</a>
-            <a href="#academic-odyssey">Events</a>
+            <a href="#academic-odyssey">CV & Events</a>
             <a href="https://www.sitingesteelu.com/CV_Siting__Estee__Lu.pdf" target="_blank">↗ CV</a>
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
+                <span class="theme-toggle-icon">☀️</span><span id="themeLabel">Light</span>
+            </button>
         </nav>
     </div>
 </div>
@@ -694,7 +774,7 @@
     <!-- ── HERO ── -->
     <header class="hero" id="about">
         <div>
-            <div class="hero-eyebrow">Available for Interviews · Job Market 2025-26</div>
+            <div class="hero-eyebrow">Available for Interviews · Job Market 2025–26</div>
             <h1>Hi, I'm Estee.</h1>
             <p class="hero-sub">
                 I am currently a <strong>Stipendiary Fellow</strong> at the <strong>University of Edinburgh</strong>. I obtained my PhD in Economics from the University of Edinburgh in September 2025, supervised by <a href="https://sites.google.com/view/edhopkins-economics" target="_blank">Prof Ed Hopkins</a> and <a href="https://sites.google.com/site/axelgottfries/" target="_blank">Dr Axel Gottfries</a>. I visited <strong>Columbia University</strong> during Spring 2025.
@@ -719,7 +799,7 @@
     <section id="research">
         <div class="section-header">
             <h2>Research</h2>
-            <span class="section-count">6 papers</span>
+            <span class="section-count">5 papers</span>
         </div>
 
         <!-- NEW alert -->
@@ -740,7 +820,7 @@
                 <span class="tag tag-jmp">Job Market Paper</span>
             </div>
             <a href="https://www.sitingesteelu.com/papers/Costly_Job_Search_with_Inattentive_Workers_Siting__Estee__Lu.pdf" class="paper-title" target="_blank">Costly Job Search with Inattentive Workers</a>
-            <div class="paper-meta">Single authored &nbsp;·&nbsp; Behavioural Economics, Game Theory </div>
+            <div class="paper-meta">Single authored &nbsp;·&nbsp; Labour Economics / Behavioural</div>
             <p class="paper-abstract collapsed" id="abs-jmp">
                 Labour market mismatch can arise from workers having limited attention. This paper proposes a Generalized Partially Directed Search model, extending on existing literature by allowing inattentive workers to have diverse priors and heterogeneous attention costs. I show that mismatch can be inherited from bias in workers' default search strategies, and heterogeneous attention costs could contribute to greater variability in the equilibrium outcomes. I also explore equilibrium multiplicity that was not adequately accounted for in previous studies. Equilibria where workers adopt different application strategies may generate both higher market efficiency and lower monopsony power than when workers employ the same application strategies. This information-theoretic approach to model job search offers new policy insights on the basis of attention.
             </p>
@@ -826,7 +906,7 @@
             <a href="https://ideas.repec.org/p/pra/mprapa/102545.html" class="paper-title" target="_blank">Status Signalling with Luxury and Cultural Goods</a>
             <div class="paper-meta">Single authored &nbsp;·&nbsp; Can books serve as signalling tools?</div>
             <p class="paper-abstract collapsed" id="abs-wp4">
-                As the world shifts towards greater consumerism, there is an increasing tendency for individuals to distinguish themselves through the goods they purchase, which assert their taste and implicit social status. While the pursuit of social status has been well-explored, most studies focus on luxury consumption; limited research has investigated cultural goods (books, etiquette classes, etc.) as another signalling tool. This paper seeks to understand and provide a theoretical grounding for individuals' choices between status goods, and its implications for policy and social mobility. The choice to signal status through luxury or cultural goods is evaluated under two scenarios: when the wage-enhancing benefits of cultural goods are not revealed, and when they are. Individuals always prefer luxury goods in the first instance, but upon satisfying certain conditions, those endowed with high cultural and social capital may consume cultural goods instead. The paper proposes policy measures for a welfare-maximising social planner to drive greater consumption of cultural goods, which also has a positive impact on intergenerational mobility.
+                As the world shifts towards greater consumerism, there is an increasing tendency for individuals to distinguish themselves through the goods they purchase — which assert their taste and implicit social status. While the pursuit of social status has been well-explored, most studies focus on luxury consumption; limited research has investigated cultural goods (books, etiquette classes, etc.) as another signalling tool. This paper seeks to understand and provide a theoretical grounding for individuals' choices between status goods, and its implications for policy and social mobility. The choice to signal status through luxury or cultural goods is evaluated under two scenarios: when the wage-enhancing benefits of cultural goods are not revealed, and when they are. Individuals always prefer luxury goods in the first instance, but upon satisfying certain conditions, those endowed with high cultural and social capital may consume cultural goods instead. The paper proposes policy measures for a welfare-maximising social planner to drive greater consumption of cultural goods, which also has a positive impact on intergenerational mobility.
             </p>
             <button class="toggle-abstract" onclick="toggleAbstract(this,'abs-wp4')">Show full abstract ↓</button>
             <div class="paper-links">
@@ -847,7 +927,7 @@
         <!-- AWARD -->
         <div class="award-badge">
             🏅 Shortlisted · Student Tutor of the Year, Teaching Awards 2024
-            &nbsp;<a href="https://www.teaching-matters-blog.ed.ac.uk/teaching-awards-2024-see-the-winners/" target="_blank" style="color:#713f12; text-decoration:underline; font-size:.8rem;">See winners</a>
+            &nbsp;<a href="https://www.teaching-matters-blog.ed.ac.uk/teaching-awards-2024-see-the-winners/" target="_blank" style="color:var(--accent-light); text-decoration:underline; font-size:.8rem;">See winners</a>
         </div>
 
         <!-- STIPENDIARY FELLOW -->
@@ -938,7 +1018,7 @@
         <!-- TUTOR -->
         <div class="teaching-role">
             <div class="teaching-role-header">
-                <div class="teaching-role-icon" style="background:#4a4a4f;">◈</div>
+                <div class="teaching-role-icon" style="background:#2a2a2a;">◈</div>
                 <div>
                     <div class="teaching-role-title">Tutor</div>
                     <div class="teaching-role-sub">University of Edinburgh &nbsp;·&nbsp; 2020–2024</div>
@@ -1122,6 +1202,22 @@
         } else {
             el.classList.add('collapsed');
             btn.textContent = 'Show full abstract ↓';
+        }
+    }
+
+    function toggleTheme() {
+        const html = document.documentElement;
+        const isLight = html.getAttribute('data-theme') === 'light';
+        const icon = document.querySelector('.theme-toggle-icon');
+        const label = document.getElementById('themeLabel');
+        if (isLight) {
+            html.removeAttribute('data-theme');
+            icon.textContent = '☀️';
+            label.textContent = 'Light';
+        } else {
+            html.setAttribute('data-theme', 'light');
+            icon.textContent = '🌙';
+            label.textContent = 'Dark';
         }
     }
 </script>

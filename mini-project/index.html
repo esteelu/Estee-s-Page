@@ -1,0 +1,1295 @@
+<title>Agent Arena</title>
+<style>
+/* layout: one calm column on a faint dot-grid ground. Hero with step links, then setup cards, roster grid, run bar with progress, results */
+:root{
+  --bg:#ecefe6;
+  --surface:#fbfcf9;
+  --surface-2:#eef1e8;
+  --fg:#172420;
+  --muted:#5c6b61;
+  --accent:#b9791c;
+  --accent-fg:#201200;
+  --border:#d3d9cb;
+  --good:#2f7d4f;
+  --bad:#b5423a;
+  --none:#aeb7a9;
+  --shadow:0 1px 2px rgba(23,36,32,.06), 0 12px 28px -16px rgba(23,36,32,.22);
+  --series-1:#2a78d6; --series-2:#eb6834; --series-3:#1baf7a; --series-4:#eda100;
+  --series-5:#e87ba4; --series-6:#008300; --series-7:#4a3aa7; --series-8:#e34948;
+  --font-display:'Fraunces',georgia,serif;
+  --font-body:'Source Sans 3',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1317; --surface:#161e24; --surface-2:#1d2830; --fg:#e8e3d6;
+    --muted:#9baaa2; --accent:#d79a3c; --accent-fg:#201200; --border:#2a3640;
+    --good:#5fbd84; --bad:#e2766d; --none:#4a5760; color-scheme:dark;
+    --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 14px 30px -16px rgba(0,0,0,.7);
+    --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70; --series-4:#c98500;
+    --series-5:#d55181; --series-6:#008300; --series-7:#9085e9; --series-8:#e66767;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1317; --surface:#161e24; --surface-2:#1d2830; --fg:#e8e3d6;
+  --muted:#9baaa2; --accent:#d79a3c; --accent-fg:#201200; --border:#2a3640;
+  --good:#5fbd84; --bad:#e2766d; --none:#4a5760; color-scheme:dark;
+  --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 14px 30px -16px rgba(0,0,0,.7);
+  --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70; --series-4:#c98500;
+  --series-5:#d55181; --series-6:#008300; --series-7:#9085e9; --series-8:#e66767;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{scroll-behavior:smooth}
+body{
+  margin:0; color:var(--fg); font-family:var(--font-body); font-size:15px; line-height:1.5;
+  background:radial-gradient(color-mix(in srgb, var(--fg) 10%, transparent) 1px, transparent 1.3px) 0 0/22px 22px, var(--bg);
+  padding-inline:16px; padding-block:40px 56px; display:flex; flex-direction:column; gap:24px;
+  max-width:1000px; margin-inline:auto;
+}
+h1,h2,h3{font-family:var(--font-display); margin:0; text-wrap:balance; font-weight:600}
+h2{font-size:1.3rem; letter-spacing:-.01em}
+.sub{margin:-8px 0 0; color:var(--muted); font-size:.9rem; max-width:62ch}
+
+/* hero */
+.hero{display:flex; flex-direction:column; gap:14px; padding-bottom:6px}
+.hero-top{display:flex; align-items:center; gap:12px}
+.glyph{display:grid; grid-template-columns:1fr 1fr; gap:3px; width:34px; height:34px; flex:none}
+.glyph i{border-radius:5px; background:color-mix(in srgb, var(--series-1) 80%, var(--surface))}
+.glyph i:nth-child(2),.glyph i:nth-child(3){background:color-mix(in srgb, var(--series-2) 80%, var(--surface))}
+.eyebrow{font-family:var(--font-mono); font-size:.74rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+h1{font-size:clamp(2.4rem, 7vw, 3.6rem); letter-spacing:-.025em; line-height:1.02; font-weight:600}
+h1 em{font-style:italic; font-weight:500; color:var(--accent)}
+.lede{color:var(--muted); max-width:60ch; font-size:1.05rem; margin:0}
+.steps{display:flex; flex-wrap:wrap; gap:8px; margin-top:4px}
+.steps a{display:inline-flex; align-items:center; gap:8px; padding:6px 14px 6px 6px; border:1px solid var(--border); border-radius:999px; background:var(--surface); color:var(--fg); text-decoration:none; font-size:.86rem; font-weight:600; transition:border-color .15s, transform .15s}
+.steps a:hover{border-color:var(--accent); transform:translateY(-1px)}
+.steps b{display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%; background:var(--accent); color:var(--accent-fg); font-family:var(--font-mono); font-size:.72rem}
+
+/* cards */
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow);
+  padding:24px; display:flex; flex-direction:column; gap:16px; scroll-margin-top:16px;
+}
+.row{display:flex; gap:12px; flex-wrap:wrap}
+.field{display:flex; flex-direction:column; gap:6px; flex:1; min-width:140px}
+.field.narrow{flex:0 0 110px; min-width:90px}
+label{font-size:.72rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); font-weight:600}
+input,select,textarea{
+  font:inherit; background:var(--surface-2); color:var(--fg); border:1px solid var(--border);
+  border-radius:10px; padding:9px 12px; min-width:0; width:100%; transition:border-color .15s, box-shadow .15s;
+}
+input:hover,select:hover,textarea:hover{border-color:color-mix(in srgb, var(--muted) 60%, var(--border))}
+textarea{resize:vertical; line-height:1.45}
+input:focus,select:focus,textarea:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent)}
+button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+button{
+  font:inherit; font-weight:600; border:1px solid var(--border); background:var(--surface-2); color:var(--fg);
+  border-radius:10px; padding:9px 16px; cursor:pointer; transition:border-color .15s, filter .15s, transform .1s;
+}
+button:hover:not(:disabled){border-color:var(--muted)}
+button:active:not(:disabled){transform:translateY(1px)}
+button.primary{background:var(--accent); color:var(--accent-fg); border-color:transparent; box-shadow:0 6px 16px -8px color-mix(in srgb, var(--accent) 80%, transparent)}
+button.primary:hover:not(:disabled){filter:brightness(1.07); border-color:transparent}
+button.ghost{background:transparent}
+button.small{padding:5px 12px; font-size:.82rem; border-radius:8px}
+button:disabled{opacity:.45; cursor:not-allowed}
+.hint{font-size:.82rem; color:var(--muted); line-height:1.5; margin:0}
+
+/* switches */
+input[type=checkbox]{appearance:none; -webkit-appearance:none; flex:none; width:34px; height:20px; padding:0; border-radius:999px; background:var(--border); border:none; position:relative; cursor:pointer; transition:background .15s}
+input[type=checkbox]::after{content:""; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:var(--surface); box-shadow:0 1px 2px rgba(0,0,0,.25); transition:transform .15s}
+input[type=checkbox]:checked{background:var(--accent)}
+input[type=checkbox]:checked::after{transform:translateX(14px)}
+input[type=checkbox]:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.toggles{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:10px}
+.toggle-row{display:flex; align-items:flex-start; gap:12px; font-size:.88rem; text-transform:none; letter-spacing:0; color:var(--fg); font-weight:400; padding:12px 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface-2); cursor:pointer; line-height:1.4}
+.toggle-row input{margin-top:1px}
+
+/* agents */
+.roster{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px}
+.agent-card{border:1px solid var(--border); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:12px; background:var(--surface-2)}
+.agent-head{display:flex; align-items:center; gap:10px}
+.avatar{flex:none; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:1rem; color:var(--fg); background:color-mix(in srgb, var(--c) 26%, var(--surface)); border:2px solid var(--c)}
+.swatch{width:10px; height:10px; border-radius:50%; flex:none}
+.agent-head input{font-weight:600; font-family:var(--font-display); font-size:1.12rem; background:transparent; border-color:transparent; padding:4px 8px}
+.agent-head input:hover{border-color:var(--border)}
+.agent-status{font-size:.78rem; font-family:var(--font-mono); min-height:1.1em}
+.agent-status.ok{color:var(--good)}
+.agent-status.err{color:var(--bad)}
+.agent-foot{display:flex; justify-content:space-between; align-items:center; gap:8px}
+.agent-card details summary{cursor:pointer}
+
+/* toast */
+.notice{position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom, 0px)); transform:translate(-50%, 14px); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:50;
+  background:var(--fg); color:var(--bg); padding:10px 18px; border-radius:999px; max-width:min(92vw, 560px); font-size:.88rem; font-weight:600; box-shadow:0 14px 34px -12px rgba(0,0,0,.5)}
+.notice.show{opacity:1; transform:translate(-50%, 0)}
+
+/* run bar */
+.runbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.round-pill{margin-left:auto; font-family:var(--font-mono); font-size:.85rem; color:var(--fg); background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:5px 14px}
+.progress{height:6px; border-radius:999px; background:var(--surface-2); overflow:hidden; border:1px solid var(--border)}
+.progress span{display:block; height:100%; width:0; background:var(--accent); border-radius:999px; transition:width .35s ease}
+
+/* log */
+#log{display:flex; flex-direction:column; gap:12px; max-height:560px; overflow-y:auto; padding-right:4px}
+.round-block{border:1px solid var(--border); border-radius:14px; padding:14px 16px; background:var(--surface-2)}
+.round-block h3{font-size:1rem; margin-bottom:6px}
+.round-block h3 small{font-family:var(--font-mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:500; margin-right:6px}
+.entry{display:flex; gap:12px; align-items:center; padding:8px 0; border-top:1px solid var(--border); flex-wrap:wrap}
+.entry:first-of-type{border-top:none}
+.dot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:8px; vertical-align:baseline}
+.entry .name{font-weight:700; flex:0 0 130px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.chip{font-family:var(--font-mono); font-size:.8rem; font-weight:600; padding:2px 11px; border-radius:999px; background:color-mix(in srgb, var(--c) 22%, var(--surface)); border:1px solid color-mix(in srgb, var(--c) 60%, transparent); color:var(--fg); flex:0 0 auto}
+.chip.unparsed{--c:var(--bad)}
+.entry details{flex:1 1 200px; min-width:0}
+.entry summary{color:var(--muted); font-size:.82rem; cursor:pointer}
+.entry .reasoning{font-size:.86rem; color:var(--muted); margin-top:4px; line-height:1.45}
+.entry .error{color:var(--bad); font-size:.82rem}
+.entry .payoff{font-family:var(--font-mono); font-weight:600; font-size:.88rem; flex:0 0 auto}
+.entry .payoff.pos{color:var(--good)}
+.entry .payoff.neg{color:var(--bad)}
+.entry .payoff.zero{color:var(--muted)}
+.round-block > .error{color:var(--bad); font-size:.82rem}
+
+/* tables */
+.matrix-scroll{overflow-x:auto}
+table.matrix-table{border-collapse:separate; border-spacing:0; font-size:.88rem; background:var(--surface)}
+table.matrix-table th,table.matrix-table td{border-right:1px solid var(--border); border-bottom:1px solid var(--border); padding:8px 12px; text-align:center}
+table.matrix-table th:first-child,table.matrix-table td:first-child{border-left:1px solid var(--border)}
+table.matrix-table thead th{border-top:1px solid var(--border); font-family:var(--font-mono); font-weight:600; color:var(--muted); background:var(--surface-2); white-space:nowrap; font-size:.76rem}
+table.matrix-table tbody th{font-family:var(--font-mono); font-weight:600; color:var(--fg); background:var(--surface-2); text-align:left; white-space:nowrap}
+table.matrix-table thead th:first-child{border-top-left-radius:12px}
+table.matrix-table thead th:last-child{border-top-right-radius:12px}
+table.matrix-table tbody tr:last-child th:first-child{border-bottom-left-radius:12px}
+table.matrix-table tbody tr:last-child td:last-child{border-bottom-right-radius:12px}
+table.matrix-table tbody td{font-variant-numeric:tabular-nums}
+table.matrix-table input{width:68px; text-align:center; padding:5px; font-family:var(--font-mono); background:transparent; border-color:transparent}
+table.matrix-table input:hover{border-color:var(--border)}
+.export-group{display:flex; gap:8px; flex-wrap:wrap}
+.free-wrap{display:flex; flex-direction:column; gap:12px}
+
+/* evolution */
+.evolution{display:flex; flex-direction:column; gap:26px}
+.evo-section{display:flex; flex-direction:column; gap:12px; min-width:0}
+.evo-section + .evo-section{border-top:1px solid var(--border); padding-top:22px}
+.evo-section h3{font-size:1.02rem}
+.evo-legend{display:flex; flex-wrap:wrap; gap:4px 16px; font-size:.82rem}
+.evo-legend span{display:inline-flex; align-items:center; gap:6px}
+.evo-legend i{display:inline-block; width:10px; height:10px; border-radius:3px}
+.evo-scroll{overflow-x:auto}
+.evo-bars{display:flex; gap:6px}
+.evo-yaxis{flex:0 0 34px; display:flex; flex-direction:column; justify-content:space-between; height:140px; font-size:.72rem; font-family:var(--font-mono); color:var(--muted); text-align:right}
+.evo-col{flex:1 0 18px; max-width:64px; display:flex; flex-direction:column; gap:6px; min-width:0}
+.evo-stack{height:140px; display:flex; flex-direction:column-reverse; gap:2px; background:color-mix(in srgb, var(--border) 45%, transparent); border-radius:6px}
+.evo-seg{min-height:0; border-radius:4px}
+.evo-xl{font-size:.72rem; font-family:var(--font-mono); color:var(--muted); text-align:center}
+.evo-grid{display:grid; gap:4px; align-items:center; font-size:.8rem}
+.evo-grid .who{font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding-right:8px}
+.evo-grid .hd{font-family:var(--font-mono); font-size:.72rem; color:var(--muted); text-align:center}
+.evo-cell{height:30px; display:flex; align-items:center; justify-content:center; border-radius:6px; font-family:var(--font-mono); font-weight:600; font-size:.78rem; color:var(--fg); border-bottom:4px solid transparent}
+.evo-cell.none{background:transparent; border:1px dashed var(--border); color:var(--muted); border-bottom-width:1px}
+#lineChart svg{display:block; width:100%; height:auto}
+.evo-note{font-size:.82rem; color:var(--muted); margin:0}
+
+footer{color:var(--muted); font-size:.8rem; line-height:1.55; border-top:1px solid var(--border); padding-top:16px; max-width:80ch}
+@media (max-width:560px){
+  body{padding-block:28px 48px}
+  .card{padding:18px; border-radius:16px}
+  .entry .name{flex:1 1 100%}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important; scroll-behavior:auto !important}
+}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<header class="hero">
+  <div class="hero-top">
+    <div class="glyph" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <span class="eyebrow">Multi-agent strategy lab</span>
+  </div>
+  <h1>Agent <em>Arena</em></h1>
+  <p class="lede">Give LLM agents a persona and a shared scenario, then watch what they choose, round after round. Each agent calls its provider's API straight from this page with the key you give it below. Nothing is saved to a server or sent anywhere else.</p>
+  <nav class="steps" aria-label="Jump to a section">
+    <a href="#scenario-card"><b>1</b>Frame the game</a>
+    <a href="#roster-card"><b>2</b>Cast the agents</a>
+    <a href="#run-card"><b>3</b>Run the rounds</a>
+    <a href="#evo-card"><b>4</b>Read the outcome</a>
+  </nav>
+</header>
+
+<section class="card" id="scenario-card">
+  <h2>The scenario</h2>
+  <p class="sub">The situation every agent is placed in, and what they can choose between.</p>
+  <div class="field">
+    <label for="rules">Rules, read to every agent</label>
+    <textarea id="rules" rows="5"></textarea>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label for="options">Choices (comma-separated)</label>
+      <input id="options" type="text">
+    </div>
+    <div class="field narrow">
+      <label for="rounds">Rounds</label>
+      <input id="rounds" type="number" min="1" max="50" step="1">
+    </div>
+  </div>
+  <div class="toggles">
+    <label class="toggle-row">
+      <input id="revealNames" type="checkbox"><span>Tell agents who else is playing</span>
+    </label>
+    <label class="toggle-row">
+      <input id="shareReasoning" type="checkbox"><span>Share past reasoning, not just choices, in the history agents see</span>
+    </label>
+    <label class="toggle-row">
+      <input id="revealPayoffs" type="checkbox"><span>Show agents the reward rules and each round's payoffs</span>
+    </label>
+  </div>
+</section>
+
+<section class="card" id="matrix-card">
+  <div class="row" style="justify-content:space-between; align-items:flex-end">
+    <h2>Rewards</h2>
+    <div class="field" style="flex:0 1 300px">
+      <label for="payoffMode">How rounds are scored</label>
+      <select id="payoffMode">
+        <option value="off">Off: log choices only</option>
+        <option value="pairwise">Pairwise matrix</option>
+        <option value="count">Multiple players: group counts</option>
+        <option value="freetext">Free-text rules: referee model</option>
+      </select>
+    </div>
+  </div>
+  <p class="hint" id="rewardHint"></p>
+  <div class="matrix-scroll" id="matrixWrap" hidden></div>
+  <div class="matrix-scroll" id="countWrap" hidden></div>
+  <div id="freeWrap" class="free-wrap" hidden>
+    <div class="field">
+      <label for="rewardText">Reward rules in plain language</label>
+      <textarea id="rewardText" rows="5" placeholder="Example: Each agent starts the round with 10 points and picks how many to contribute to a shared pot. The pot is multiplied by 1.5 and split equally among all agents. An agent's payoff is the points it kept plus its share of the pot."></textarea>
+    </div>
+    <div class="field" style="max-width:320px">
+      <label for="refereeSelect">Referee model (uses this agent's provider and key)</label>
+      <select id="refereeSelect"></select>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="roster-card">
+  <div class="row" style="justify-content:space-between; align-items:center">
+    <h2>Agents</h2>
+    <button id="addAgent" class="small">+ Add agent</button>
+  </div>
+  <p class="hint">Each agent needs its own provider and API key. Keys live only in this tab's memory for this session — they're cleared on reload and never written to disk or sent to us.</p>
+  <div class="roster" id="roster"></div>
+</section>
+
+<div class="notice" id="notice" role="status" aria-live="polite"></div>
+
+<section class="card" id="run-card">
+  <div class="runbar">
+    <button id="runOne" class="primary">Run next round</button>
+    <button id="runAll">Run all remaining rounds</button>
+    <button id="reset" class="ghost" data-clear>Restart</button>
+    <span class="round-pill" id="roundPill">Round 0 of 0</span>
+  </div>
+  <div class="progress" aria-hidden="true"><span id="progressFill"></span></div>
+</section>
+
+<section class="card" id="evo-card">
+  <div class="row" style="justify-content:space-between; align-items:center">
+    <h2>Evolution and outcome</h2>
+    <button id="clearResults" class="small ghost" data-clear>Clear results &amp; restart</button>
+  </div>
+  <p class="sub">How choices shift over the rounds and what each agent ends up with.</p>
+  <div id="evolution" class="evolution"></div>
+</section>
+
+<section class="card" id="results-card">
+  <div class="row" style="justify-content:space-between; align-items:center">
+    <h2>What happened</h2>
+    <div class="export-group">
+      <button id="downloadCsv" class="small primary">Download results (CSV)</button>
+      <button id="downloadJson" class="small primary">Download full export (JSON)</button>
+    </div>
+  </div>
+  <p class="hint">The CSV is the tidy round-by-round choices and payoffs. The JSON export also includes the full game design — scenario, rules, matrix and agent setups (no API keys). Downloading will ask you to confirm a save. If that's unavailable wherever this page is open, copy the data instead: <button id="copyCsv" class="small ghost">Copy CSV</button> <button id="copyJson" class="small ghost">Copy JSON</button></p>
+  <div id="log"></div>
+</section>
+
+<footer>
+  Supports OpenAI and Anthropic directly, plus any OpenAI-compatible endpoint (Groq, Mistral, OpenRouter, a local server, etc.) via the Custom provider. Anthropic calls from a browser require their direct-browser-access header, which this page sends automatically — note that it also means your Anthropic key is visible in this tab's network traffic, same as any client-side call.
+</footer>
+
+<script>
+(function(){
+"use strict";
+
+const PALETTE = [1,2,3,4,5,6].map(n => `var(--series-${n})`);
+
+const DEFAULT_SCENARIO = {
+  rules: "You and the other participants each privately pick one action, every round, without seeing each other's reasoning in advance. You will play several rounds against the same participants and will see the choice history from earlier rounds before you decide. The payoffs for each outcome are listed below the rules.",
+  options: "Cooperate, Defect",
+  rounds: 5,
+  revealNames: true,
+  shareReasoning: false,
+  revealPayoffs: true,
+  payoffMode: "pairwise",
+  matrix: { Cooperate: { Cooperate: 3, Defect: 0 }, Defect: { Cooperate: 5, Defect: 1 } },
+  countMatrix: {},
+  rewardText: "",
+  refereeId: ""
+};
+
+const DEFAULT_AGENTS = [
+  {
+    name: "Pragmatist",
+    provider: "openai",
+    model: "gpt-4o-mini",
+    baseUrl: "",
+    apiKey: "",
+    temperature: 0.7,
+    maxTokens: 300,
+    extraParams: "",
+    persona: "You are a pragmatic, self-interested participant. Maximize your own payoff over the full run of rounds, but you understand that cooperation can pay off if it is reciprocated."
+  },
+  {
+    name: "Idealist",
+    provider: "anthropic",
+    model: "claude-sonnet-5",
+    baseUrl: "",
+    apiKey: "",
+    temperature: 0.7,
+    maxTokens: 300,
+    extraParams: "",
+    persona: "You are a cooperative, trust-building participant. You default to cooperating and only shift toward defecting if you have been betrayed repeatedly."
+  }
+];
+
+function uid(){ return 'a' + Math.random().toString(36).slice(2,10); }
+
+function loadState(){
+  let saved = null;
+  try {
+    const raw = localStorage.getItem('agentArenaDraft');
+    if (raw) saved = JSON.parse(raw);
+  } catch(e){ saved = null; }
+
+  const savedScenario = (saved && saved.scenario) || {};
+  const scenario = Object.assign({}, DEFAULT_SCENARIO, savedScenario);
+  if (savedScenario.payoffMode === undefined && savedScenario.useMatrix === false) scenario.payoffMode = 'off';
+  delete scenario.useMatrix;
+  let agents = (saved && saved.agents && saved.agents.length) ? saved.agents : DEFAULT_AGENTS.map(a => Object.assign({id: uid()}, a));
+  agents = agents.map(a => Object.assign({apiKey:""}, a, {apiKey:""}));
+  const rounds = (saved && saved.rounds) || [];
+  return { scenario, agents, rounds, running:false };
+}
+
+const state = loadState();
+
+function persist(){
+  try {
+    const safeAgents = state.agents.map(a => { const c = Object.assign({}, a); delete c.apiKey; return c; });
+    localStorage.setItem('agentArenaDraft', JSON.stringify({ scenario: state.scenario, agents: safeAgents, rounds: state.rounds }));
+  } catch(e){ /* storage unavailable — continue without persistence */ }
+}
+
+function colorFor(agentId){
+  const idx = state.agents.findIndex(a => a.id === agentId);
+  return PALETTE[(idx < 0 ? 0 : idx) % PALETTE.length];
+}
+
+function showNotice(msg){
+  const el = document.getElementById('notice');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(showNotice._t);
+  showNotice._t = setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+function getOptions(){
+  return state.scenario.options.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+/* ---- rendering ---- */
+
+function renderScenario(){
+  document.getElementById('rules').value = state.scenario.rules;
+  document.getElementById('options').value = state.scenario.options;
+  document.getElementById('rounds').value = state.scenario.rounds;
+  document.getElementById('revealNames').checked = !!state.scenario.revealNames;
+  document.getElementById('shareReasoning').checked = !!state.scenario.shareReasoning;
+  document.getElementById('revealPayoffs').checked = !!state.scenario.revealPayoffs;
+  document.getElementById('rewardText').value = state.scenario.rewardText || '';
+}
+
+function agentCardHtml(agent, idx){
+  const color = PALETTE[idx % PALETTE.length];
+  return `
+    <div class="agent-card" data-id="${agent.id}">
+      <div class="agent-head">
+        <span class="avatar" style="--c:${color}">${escapeHtml((agent.name || '?').trim().charAt(0).toUpperCase() || '?')}</span>
+        <input data-field="name" value="${escapeAttr(agent.name)}" aria-label="Agent name">
+      </div>
+      <div class="field">
+        <label>Persona / objective</label>
+        <textarea data-field="persona" rows="3">${escapeHtml(agent.persona)}</textarea>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Provider</label>
+          <select data-field="provider">
+            <option value="openai" ${agent.provider==='openai'?'selected':''}>OpenAI</option>
+            <option value="anthropic" ${agent.provider==='anthropic'?'selected':''}>Anthropic</option>
+            <option value="custom" ${agent.provider==='custom'?'selected':''}>Custom (OpenAI-compatible)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input data-field="model" value="${escapeAttr(agent.model)}">
+        </div>
+      </div>
+      ${agent.provider === 'custom' ? `
+      <div class="field">
+        <label>Endpoint URL</label>
+        <input data-field="baseUrl" placeholder="https://.../v1/chat/completions" value="${escapeAttr(agent.baseUrl)}">
+      </div>` : ''}
+      <div class="field">
+        <label>API key</label>
+        <input data-field="apiKey" type="password" placeholder="not stored" value="${escapeAttr(agent.apiKey)}" autocomplete="off">
+      </div>
+      <div class="row">
+        <div class="field narrow">
+          <label>Temperature</label>
+          <input data-field="temperature" type="number" min="0" max="2" step="0.1" value="${agent.temperature}">
+        </div>
+        <div class="field narrow">
+          <label>Max tokens</label>
+          <input data-field="maxTokens" type="number" min="16" max="4000" step="1" value="${agent.maxTokens}">
+        </div>
+      </div>
+      <details>
+        <summary class="hint" style="cursor:pointer">Extra parameters (advanced)</summary>
+        <textarea data-field="extraParams" rows="2" placeholder='{"top_p": 0.9}' style="margin-top:6px">${escapeHtml(agent.extraParams || "")}</textarea>
+      </details>
+      <div class="agent-status" data-role="status"></div>
+      <div class="agent-foot">
+        <button class="small" data-action="test">Test key</button>
+        <button class="small ghost" data-action="remove">Remove</button>
+      </div>
+    </div>`;
+}
+
+function renderAgents(){
+  document.getElementById('roster').innerHTML = state.agents.map(agentCardHtml).join('');
+}
+
+function renderRunbar(){
+  const total = state.scenario.rounds;
+  document.getElementById('roundPill').textContent = `Round ${state.rounds.length} of ${total}`;
+  document.getElementById('progressFill').style.width = `${Math.min(100, Math.round(100 * state.rounds.length / total))}%`;
+  const done = state.rounds.length >= total;
+  document.getElementById('runOne').disabled = state.running || done;
+  document.getElementById('runAll').disabled = state.running || done;
+}
+
+function renderLog(){
+  const log = document.getElementById('log');
+  log.innerHTML = state.rounds.map(r => {
+    const entries = r.entries.map(e => {
+      const agent = state.agents.find(a => a.id === e.agentId);
+      const name = agent ? agent.name : '(removed agent)';
+      const color = agent ? colorFor(agent.id) : '#888';
+      if (e.error) {
+        return `<div class="entry"><span class="name"><i class="dot" style="background:${color}"></i>${escapeHtml(name)}</span><span class="chip unparsed">error</span><span class="error">${escapeHtml(e.error)}</span></div>`;
+      }
+      const optIdx = getOptions().indexOf(e.choice);
+      const choiceClass = (e.choice && optIdx >= 0) ? 'chip' : 'chip unparsed';
+      const choiceStyle = optIdx >= 0 ? ` style="--c:${optionColor(optIdx)}"` : '';
+      const choiceText = e.choice || 'unparsed';
+      let payoffHtml = '';
+      if (typeof e.payoff === 'number') {
+        const sign = e.payoff > 0 ? 'pos' : (e.payoff < 0 ? 'neg' : 'zero');
+        payoffHtml = `<span class="payoff ${sign}">${e.payoff > 0 ? '+' : ''}${e.payoff}</span>`;
+      }
+      return `<div class="entry">
+        <span class="name"><i class="dot" style="background:${color}"></i>${escapeHtml(name)}</span>
+        <span class="${choiceClass}"${choiceStyle}>${escapeHtml(choiceText)}</span>
+        ${payoffHtml}
+        <details><summary>reasoning</summary><div class="reasoning">${escapeHtml(e.reasoning || e.raw || '(none)')}</div></details>
+      </div>`;
+    }).join('');
+    const note = r.payoffNote ? `<details style="margin-top:6px"><summary class="hint" style="cursor:pointer">referee's working</summary><div class="reasoning">${escapeHtml(r.payoffNote)}</div></details>` : '';
+    const refErr = r.payoffError ? `<div class="error" style="margin-top:6px">Referee could not score this round: ${escapeHtml(r.payoffError)}</div>` : '';
+    return `<div class="round-block"><h3><small>Round</small>${r.roundIndex}</h3>${entries}${note}${refErr}</div>`;
+  }).join('') || '<p class="hint">No rounds run yet.</p>';
+  log.scrollTop = log.scrollHeight;
+}
+
+function renderAll(){
+  renderAgents();
+  renderRunbar();
+  renderLog();
+  renderRewards();
+  renderEvolution();
+}
+
+function rebuildMatrixStructure(){
+  const options = getOptions();
+  const prev = state.scenario.matrix || {};
+  const next = {};
+  options.forEach(row => {
+    next[row] = {};
+    options.forEach(col => {
+      next[row][col] = (prev[row] && typeof prev[row][col] === 'number') ? prev[row][col] : 0;
+    });
+  });
+  state.scenario.matrix = next;
+}
+
+function renderMatrix(){
+  const options = getOptions();
+  const wrap = document.getElementById('matrixWrap');
+  if (options.length < 2) {
+    wrap.innerHTML = '<p class="hint">Add at least two choices above to edit the matrix.</p>';
+    return;
+  }
+  const matrix = state.scenario.matrix;
+  let html = '<table class="matrix-table"><thead><tr><th>your choice \\ theirs</th>';
+  options.forEach(col => html += `<th>${escapeHtml(col)}</th>`);
+  html += '</tr></thead><tbody>';
+  options.forEach(row => {
+    html += `<tr><th>${escapeHtml(row)}</th>`;
+    options.forEach(col => {
+      const val = (matrix[row] && typeof matrix[row][col] === 'number') ? matrix[row][col] : 0;
+      html += `<td><input type="number" step="0.5" data-row="${escapeAttr(row)}" data-col="${escapeAttr(col)}" value="${val}"></td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+const MAX_COUNT_COLUMNS = 150;
+
+function binom(n, k){
+  let r = 1;
+  for (let i = 1; i <= k; i++) r = r * (n - k + i) / i;
+  return Math.round(r);
+}
+
+function compositions(total, parts){
+  if (parts === 1) return [[total]];
+  const out = [];
+  for (let i = total; i >= 0; i--) compositions(total - i, parts - 1).forEach(rest => out.push([i].concat(rest)));
+  return out;
+}
+
+// Every way the other agents can split across the options, e.g. [2,0], [1,1], [0,2] for 2 others and 2 options.
+function countColumns(){
+  const m = getOptions().length, others = state.agents.length - 1;
+  if (m < 2 || others < 1) return [];
+  if (binom(others + m - 1, m - 1) > MAX_COUNT_COLUMNS) return null;
+  return compositions(others, m);
+}
+
+function rebuildCountMatrix(){
+  const options = getOptions();
+  const cols = countColumns();
+  const prev = state.scenario.countMatrix || {};
+  const next = {};
+  if (cols) {
+    options.forEach(row => {
+      next[row] = {};
+      cols.forEach(c => {
+        const key = c.join('|');
+        next[row][key] = (prev[row] && typeof prev[row][key] === 'number') ? prev[row][key] : 0;
+      });
+    });
+  }
+  state.scenario.countMatrix = next;
+}
+
+function renderCountMatrix(){
+  const options = getOptions();
+  const wrap = document.getElementById('countWrap');
+  const cols = countColumns();
+  if (options.length < 2) { wrap.innerHTML = '<p class="hint">Add at least two choices above to edit the table.</p>'; return; }
+  if (state.agents.length < 2) { wrap.innerHTML = '<p class="hint">Add at least two agents to define group payoffs.</p>'; return; }
+  if (cols === null) { wrap.innerHTML = `<p class="hint">${options.length} choices with ${state.agents.length} agents needs more than ${MAX_COUNT_COLUMNS} columns. Use fewer choices or agents, or switch to free-text rules.</p>`; return; }
+  const matrix = state.scenario.countMatrix;
+  let html = '<table class="matrix-table"><thead><tr><th>your choice \\ others picked</th>';
+  cols.forEach(c => html += `<th>${options.map((o, i) => `${escapeHtml(o)} ×${c[i]}`).join('<br>')}</th>`);
+  html += '</tr></thead><tbody>';
+  options.forEach(row => {
+    html += `<tr><th>${escapeHtml(row)}</th>`;
+    cols.forEach(c => {
+      const key = c.join('|');
+      const val = (matrix[row] && typeof matrix[row][key] === 'number') ? matrix[row][key] : 0;
+      html += `<td><input type="number" step="0.5" data-row="${escapeAttr(row)}" data-key="${escapeAttr(key)}" value="${val}"></td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function renderReferee(){
+  const sel = document.getElementById('refereeSelect');
+  if (!state.agents.some(a => a.id === state.scenario.refereeId)) state.scenario.refereeId = state.agents.length ? state.agents[0].id : '';
+  sel.innerHTML = state.agents.map(a => `<option value="${escapeAttr(a.id)}" ${a.id === state.scenario.refereeId ? 'selected' : ''}>${escapeHtml(a.name)} (${escapeHtml(a.model || 'no model')})</option>`).join('');
+}
+
+function renderRewards(){
+  const mode = state.scenario.payoffMode;
+  const n = state.agents.length;
+  document.getElementById('payoffMode').value = mode;
+  document.getElementById('matrixWrap').hidden = mode !== 'pairwise';
+  document.getElementById('countWrap').hidden = mode !== 'count';
+  document.getElementById('freeWrap').hidden = mode !== 'freetext';
+  const hints = {
+    off: 'Rounds will log choices only, with no scoring.',
+    pairwise: "Payoff to the row choice when it's played against the column choice. With more than two agents, each agent's payoff for the round is the sum of this value across every other agent it's matched against.",
+    count: `Your payoff for the round depends on your own choice and on how many of the other ${Math.max(n - 1, 0)} agents picked each option. Fill in one value per combination. The table rebuilds when you change the choices or the number of agents, keeping values that still apply.`,
+    freetext: "Describe the rewards in plain language. After each round, the referee model reads your rules and everyone's choices and returns each agent's payoff. The arithmetic comes from an LLM, so check its working in the log, and use a matrix mode when you need exact, repeatable scoring."
+  };
+  document.getElementById('rewardHint').textContent = hints[mode] || '';
+  if (mode === 'pairwise') renderMatrix();
+  if (mode === 'count') renderCountMatrix();
+  if (mode === 'freetext') renderReferee();
+}
+
+function payoffRulesForPrompt(){
+  const mode = state.scenario.payoffMode;
+  const options = getOptions();
+  if (mode === 'pairwise') {
+    const lines = ['Payoffs. Your payoff against one other participant depends on both choices. With several others, your payoff for the round is the sum across all of them:'];
+    options.forEach(r => options.forEach(c => {
+      const v = state.scenario.matrix[r] ? state.scenario.matrix[r][c] : 0;
+      lines.push(`- you ${r}, they ${c}: ${v}`);
+    }));
+    return lines.join('\n');
+  }
+  if (mode === 'count') {
+    const cols = countColumns();
+    if (!cols) return '';
+    const lines = [`Payoffs. Your payoff for the round depends on your choice and on how many of the other ${state.agents.length - 1} participants pick each option:`];
+    options.forEach(r => cols.forEach(c => {
+      const v = state.scenario.countMatrix[r] ? state.scenario.countMatrix[r][c.join('|')] : 0;
+      lines.push(`- you ${r}; others: ${options.map((o, i) => `${c[i]} ${o}`).join(', ')}: ${v}`);
+    }));
+    return lines.join('\n');
+  }
+  if (mode === 'freetext') return `Payoff rules:\n${(state.scenario.rewardText || '').trim()}`;
+  return '';
+}
+
+async function scoreRound(entries, roundIndex){
+  const mode = state.scenario.payoffMode;
+  if (mode === 'pairwise') return { entries: computePairwise(entries) };
+  if (mode === 'count') return { entries: computeCount(entries) };
+  if (mode === 'freetext') return await computeFreeText(entries, roundIndex);
+  return { entries: entries.map(e => Object.assign({}, e, { payoff: null })) };
+}
+
+function computeCount(entries){
+  const options = getOptions();
+  const allValid = entries.every(e => e.choice && options.includes(e.choice));
+  return entries.map(e => {
+    if (!allValid) return Object.assign({}, e, { payoff: null });
+    const counts = options.map(() => 0);
+    entries.forEach(o => { if (o.agentId !== e.agentId) counts[options.indexOf(o.choice)]++; });
+    const row = state.scenario.countMatrix[e.choice];
+    const v = row ? row[counts.join('|')] : undefined;
+    return Object.assign({}, e, { payoff: typeof v === 'number' ? v : null });
+  });
+}
+
+const REFEREE_SYSTEM = 'You are a neutral, precise referee for a game. You apply the stated reward rules exactly to the choices made and do the arithmetic carefully. You never take part in the game.';
+
+async function computeFreeText(entries, roundIndex){
+  const referee = state.agents.find(a => a.id === state.scenario.refereeId) || state.agents[0];
+  const nameOf = id => { const a = state.agents.find(a => a.id === id); return a ? a.name : id; };
+  const scored = entries.filter(e => e.choice && !e.error);
+  const none = entries.map(e => Object.assign({}, e, { payoff: null }));
+  if (!scored.length) return { entries: none, error: 'no agent made a valid choice' };
+
+  const lines = ['REWARD RULES:', state.scenario.rewardText.trim(), '', `Choices available: ${getOptions().join(', ')}`];
+  if (state.rounds.length) {
+    lines.push('', 'Earlier rounds:');
+    state.rounds.forEach(r => lines.push(`Round ${r.roundIndex}: ` + r.entries.map(e => `${nameOf(e.agentId)} chose ${e.choice || 'nothing valid'}${typeof e.payoff === 'number' ? ` (payoff ${e.payoff})` : ''}`).join('; ')));
+  }
+  lines.push('', `Round ${roundIndex} choices:`);
+  scored.forEach(e => lines.push(`- ${nameOf(e.agentId)}: ${e.choice}`));
+  lines.push('', 'Work out each listed participant\'s payoff for this round under the rules. Reply with ONLY a JSON object: {"payoffs": {"<participant name>": <number>, ...}, "explanation": "<brief working>"}. No other text.');
+
+  try {
+    const text = await callProvider(Object.assign({}, referee, { temperature: 0, maxTokens: Math.max(Number(referee.maxTokens) || 0, 800) }), REFEREE_SYSTEM, lines.join('\n'));
+    const start = text.indexOf('{'), end = text.lastIndexOf('}');
+    if (start < 0 || end < start) return { entries: none, error: `unreadable reply: ${text.slice(0, 120)}` };
+    const obj = JSON.parse(text.slice(start, end + 1));
+    const table = obj.payoffs || {};
+    const byName = {};
+    Object.keys(table).forEach(k => { byName[k.trim().toLowerCase()] = Number(table[k]); });
+    const out = entries.map(e => {
+      const v = byName[nameOf(e.agentId).trim().toLowerCase()];
+      return Object.assign({}, e, { payoff: Number.isFinite(v) ? v : null });
+    });
+    return { entries: out, note: String(obj.explanation || '') };
+  } catch(err) {
+    return { entries: none, error: err.message || String(err) };
+  }
+}
+
+function computePairwise(entries){
+  const matrix = state.scenario.matrix;
+  return entries.map(e => {
+    if (!e.choice || e.error) return Object.assign({}, e, { payoff: null });
+    let total = 0, matched = 0;
+    entries.forEach(other => {
+      if (other.agentId === e.agentId || !other.choice) return;
+      const val = matrix[e.choice] ? matrix[e.choice][other.choice] : undefined;
+      if (typeof val === 'number') { total += val; matched++; }
+    });
+    return Object.assign({}, e, { payoff: matched ? total : null });
+  });
+}
+
+/* ---- evolution and outcome panel ---- */
+
+function optionColor(i){ return `var(--series-${(i % 8) + 1})`; }
+
+function uniquePrefixes(options){
+  return options.map(o => {
+    for (let len = 1; len <= o.length; len++) {
+      const p = o.slice(0, len).toLowerCase();
+      if (options.filter(x => x.toLowerCase().startsWith(p)).length === 1) return o.slice(0, len);
+    }
+    return o;
+  });
+}
+
+function fmtNum(v){ return Number.isInteger(v) ? String(v) : v.toFixed(2); }
+
+function niceTicks(lo, hi, n){
+  const raw = (hi - lo) / n || 1;
+  const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+  const f = raw / pow;
+  const step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * pow;
+  const out = [];
+  const end = Math.ceil(hi / step) * step;
+  for (let v = Math.floor(lo / step) * step; v <= end + step / 1e6; v += step) out.push(Math.round(v / step) * step);
+  return out;
+}
+
+function legendHtml(items){
+  return `<div class="evo-legend">${items.map(it => `<span><i style="background:${it.color}"></i>${escapeHtml(it.label)}</span>`).join('')}</div>`;
+}
+
+function aggregateTableHtml(options, anyPayoff){
+  const rows = state.agents.map(a => {
+    let total = 0, scoredRounds = 0, played = 0;
+    const counts = options.map(() => 0);
+    state.rounds.forEach(r => {
+      const e = r.entries.find(e => e.agentId === a.id);
+      if (!e) return;
+      played++;
+      const i = options.indexOf(e.choice);
+      if (i >= 0) counts[i]++;
+      if (typeof e.payoff === 'number') { total += e.payoff; scoredRounds++; }
+    });
+    return { agent: a, total, scoredRounds, played, counts };
+  });
+  const group = {
+    total: rows.reduce((s, r) => s + r.total, 0),
+    scoredRounds: rows.reduce((s, r) => s + r.scoredRounds, 0),
+    played: rows.reduce((s, r) => s + r.played, 0),
+    counts: options.map((_, i) => rows.reduce((s, r) => s + r.counts[i], 0))
+  };
+  const share = (n, d) => d ? `${Math.round(100 * n / d)}%` : '&ndash;';
+  const cells = r => `${anyPayoff ? `<td>${r.scoredRounds ? fmtNum(r.total) : '&ndash;'}</td><td>${r.scoredRounds ? fmtNum(r.total / r.scoredRounds) : '&ndash;'}</td>` : ''}${r.counts.map((n, i) => `<td title="${n} of ${r.played}">${share(n, r.played)}</td>`).join('')}`;
+  let html = '<table class="matrix-table"><thead><tr><th>Agent</th>';
+  if (anyPayoff) html += '<th>Total payoff</th><th>Average per round</th>';
+  html += options.map(o => `<th>% ${escapeHtml(o)}</th>`).join('') + '</tr></thead><tbody>';
+  rows.forEach(r => { html += `<tr><th><span class="swatch" style="display:inline-block; background:${colorFor(r.agent.id)}; margin-right:6px"></span>${escapeHtml(r.agent.name)}</th>${cells(r)}</tr>`; });
+  html += `<tr><th>All agents</th>${cells(group)}</tr></tbody></table>`;
+  return html;
+}
+
+function groupBarsHtml(options){
+  const per = state.rounds.map(r => {
+    const counts = options.map(() => 0);
+    let none = 0;
+    r.entries.forEach(e => { const i = options.indexOf(e.choice); if (i >= 0) counts[i]++; else none++; });
+    return { round: r.roundIndex, counts, none };
+  });
+  const anyNone = per.some(p => p.none > 0);
+  const legend = options.map((o, i) => ({ label: o, color: optionColor(i) }));
+  if (anyNone) legend.push({ label: 'No valid choice', color: 'var(--none)' });
+  const cols = per.map(p => {
+    const label = options.map((o, i) => `${o} ${p.counts[i]}`).concat(p.none ? [`no valid choice ${p.none}`] : []).join(', ');
+    const segs = options.map((o, i) => p.counts[i] ? `<div class="evo-seg" style="flex:${p.counts[i]} 1 0; background:${optionColor(i)}" title="Round ${p.round}: ${escapeAttr(o)} ${p.counts[i]}"></div>` : '').join('')
+      + (p.none ? `<div class="evo-seg" style="flex:${p.none} 1 0; background:var(--none)" title="Round ${p.round}: no valid choice ${p.none}"></div>` : '');
+    return `<div class="evo-col" title="Round ${p.round}: ${escapeAttr(label)}"><div class="evo-stack">${segs}</div><div class="evo-xl">${p.round}</div></div>`;
+  }).join('');
+  return `${legendHtml(legend)}<div class="evo-scroll"><div class="evo-bars"><div class="evo-yaxis"><span>100%</span><span>0</span></div>${cols}</div></div>
+    <p class="evo-note">Share of agents making each choice, round by round. Hover a bar for counts.</p>`;
+}
+
+function agentGridHtml(options){
+  const prefixes = uniquePrefixes(options);
+  const n = state.rounds.length;
+  const legend = options.map((o, i) => ({ label: `${prefixes[i]} = ${o}`, color: optionColor(i) }));
+  let html = legendHtml(legend) + `<div class="evo-scroll"><div class="evo-grid" style="grid-template-columns:minmax(80px,130px) repeat(${n}, minmax(28px,1fr))"><div></div>`;
+  state.rounds.forEach(r => { html += `<div class="hd">${r.roundIndex}</div>`; });
+  state.agents.forEach(a => {
+    html += `<div class="who">${escapeHtml(a.name)}</div>`;
+    state.rounds.forEach(r => {
+      const e = r.entries.find(e => e.agentId === a.id);
+      const i = e ? options.indexOf(e.choice) : -1;
+      if (i < 0) {
+        html += `<div class="evo-cell none" title="${escapeAttr(a.name)}, round ${r.roundIndex}: ${e && e.error ? 'error' : 'no valid choice'}">&ndash;</div>`;
+      } else {
+        const pay = typeof e.payoff === 'number' ? `, payoff ${e.payoff}` : '';
+        html += `<div class="evo-cell" style="background:color-mix(in srgb, ${optionColor(i)} 38%, var(--surface)); border-bottom-color:${optionColor(i)}" title="${escapeAttr(a.name)}, round ${r.roundIndex}: ${escapeAttr(e.choice)}${pay}">${escapeHtml(prefixes[i])}</div>`;
+      }
+    });
+  });
+  return html + '</div></div>';
+}
+
+function drawLineChart(el){
+  const rounds = state.rounds;
+  const series = state.agents.map(a => {
+    let cum = 0;
+    return { agent: a, points: rounds.map(r => {
+      const e = r.entries.find(e => e.agentId === a.id);
+      const pay = e && typeof e.payoff === 'number' ? e.payoff : 0;
+      cum += pay;
+      return { round: r.roundIndex, cum, pay };
+    }) };
+  });
+  const values = series.flatMap(s => s.points.map(p => p.cum));
+  let lo = Math.min(0, ...values), hi = Math.max(0, ...values);
+  if (hi === lo) hi = lo + 1;
+  const ticks = niceTicks(lo, hi, 4);
+  const yMin = ticks[0], yMax = ticks[ticks.length - 1];
+  const W = Math.max(el.clientWidth, 280), H = 220, m = { l: 48, r: 14, t: 12, b: 30 };
+  const x = i => rounds.length === 1 ? m.l + (W - m.l - m.r) / 2 : m.l + i * (W - m.l - m.r) / (rounds.length - 1);
+  const y = v => m.t + (1 - (v - yMin) / (yMax - yMin)) * (H - m.t - m.b);
+  const every = Math.ceil(rounds.length / 12);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative payoff by round for each agent">`;
+  ticks.forEach(t => {
+    svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" style="stroke:${t === 0 ? 'var(--muted)' : 'var(--border)'}; stroke-width:1"/>`;
+    svg += `<text x="${m.l - 8}" y="${y(t) + 4}" text-anchor="end" font-size="11" style="fill:var(--muted); font-family:var(--font-mono)">${fmtNum(t)}</text>`;
+  });
+  rounds.forEach((r, i) => {
+    if (i % every === 0) svg += `<text x="${x(i)}" y="${H - 10}" text-anchor="middle" font-size="11" style="fill:var(--muted); font-family:var(--font-mono)">${r.roundIndex}</text>`;
+  });
+  series.forEach(s => {
+    const color = colorFor(s.agent.id);
+    if (s.points.length > 1) svg += `<polyline fill="none" points="${s.points.map((p, i) => `${x(i)},${y(p.cum)}`).join(' ')}" style="stroke:${color}; stroke-width:2; stroke-linejoin:round"/>`;
+    s.points.forEach((p, i) => {
+      const tip = `${escapeHtml(s.agent.name)}, round ${p.round}: cumulative ${fmtNum(p.cum)} (this round ${fmtNum(p.pay)})`;
+      svg += `<circle cx="${x(i)}" cy="${y(p.cum)}" r="4" style="fill:${color}; stroke:var(--surface); stroke-width:2"><title>${tip}</title></circle>`;
+      svg += `<circle cx="${x(i)}" cy="${y(p.cum)}" r="11" style="fill:transparent"><title>${tip}</title></circle>`;
+    });
+  });
+  el.innerHTML = svg + '</svg>';
+}
+
+function renderEvolution(){
+  const host = document.getElementById('evolution');
+  if (!state.rounds.length) {
+    host.innerHTML = '<p class="hint">Run a round to see how choices evolve and what each agent earns. Your results stay here until you clear them.</p>';
+    return;
+  }
+  const options = getOptions();
+  const anyPayoff = state.rounds.some(r => r.entries.some(e => typeof e.payoff === 'number'));
+  const payoffSection = anyPayoff
+    ? `<div class="evo-section"><h3>Cumulative payoff</h3>${legendHtml(state.agents.map(a => ({ label: a.name, color: colorFor(a.id) })))}<div id="lineChart"></div></div>`
+    : `<div class="evo-section"><h3>Cumulative payoff</h3><p class="evo-note">No payoffs yet. Choose a scoring mode under Rewards to track what each agent earns.</p></div>`;
+  host.innerHTML = `
+    <div class="evo-section"><h3>Aggregate outcome after ${state.rounds.length} ${state.rounds.length === 1 ? 'round' : 'rounds'}</h3><div class="matrix-scroll">${aggregateTableHtml(options, anyPayoff)}</div></div>
+    <div class="evo-section"><h3>Group choices by round</h3>${groupBarsHtml(options)}</div>
+    <div class="evo-section"><h3>Each agent's choices</h3>${agentGridHtml(options)}</div>
+    ${payoffSection}`;
+  const line = document.getElementById('lineChart');
+  if (line) drawLineChart(line);
+}
+
+function escapeHtml(s){
+  return String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+function escapeAttr(s){ return escapeHtml(s).replace(/"/g, '&quot;'); }
+
+/* ---- provider calls ---- */
+
+async function callProvider(agent, systemPrompt, userPrompt){
+  let extra = {};
+  if (agent.extraParams && agent.extraParams.trim()) {
+    try { extra = JSON.parse(agent.extraParams); } catch(e) { /* ignore malformed extra params */ }
+  }
+  if (agent.provider === 'anthropic') {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': agent.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify(Object.assign({
+        model: agent.model,
+        system: systemPrompt,
+        max_tokens: Number(agent.maxTokens) || 300,
+        temperature: Number(agent.temperature),
+        messages: [{ role: 'user', content: userPrompt }]
+      }, extra))
+    });
+    if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0,180)}`);
+    const data = await res.json();
+    return (data.content || []).map(c => c.text || '').join('');
+  }
+
+  const url = agent.provider === 'openai' ? 'https://api.openai.com/v1/chat/completions' : agent.baseUrl;
+  if (!url) throw new Error('missing endpoint URL');
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'authorization': `Bearer ${agent.apiKey}` },
+    body: JSON.stringify(Object.assign({
+      model: agent.model,
+      temperature: Number(agent.temperature),
+      max_tokens: Number(agent.maxTokens) || 300,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ]
+    }, extra))
+  });
+  if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0,180)}`);
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content ?? '';
+}
+
+function extractChoice(text, options){
+  const match = text.match(/\{[^{}]*\}/s);
+  if (match) {
+    try {
+      const obj = JSON.parse(match[0]);
+      if (obj && obj.choice) {
+        const exact = options.find(o => o.toLowerCase() === String(obj.choice).trim().toLowerCase());
+        return { choice: exact || String(obj.choice).trim(), reasoning: obj.reasoning || '', raw: text };
+      }
+    } catch(e) { /* fall through to plain-text match */ }
+  }
+  const lower = text.toLowerCase();
+  const found = options.find(o => lower.includes(o.toLowerCase()));
+  return { choice: found || null, reasoning: '', raw: text };
+}
+
+function buildUserPrompt(roundIndex, totalRounds){
+  const lines = [state.scenario.rules.trim(), '', `Available choices: ${getOptions().join(', ')}`];
+  if (state.scenario.revealNames) {
+    lines.push(`Participants this round: ${state.agents.map(a => a.name).join(', ')}`);
+  }
+  const payoffRules = state.scenario.revealPayoffs ? payoffRulesForPrompt() : '';
+  if (payoffRules) lines.push('', payoffRules);
+  if (state.rounds.length) {
+    lines.push('', 'History so far:');
+    state.rounds.forEach(r => {
+      const parts = r.entries.map(e => {
+        const agent = state.agents.find(a => a.id === e.agentId);
+        const name = agent ? agent.name : '(removed agent)';
+        let s = `${name} chose "${e.choice || 'unparsed'}"`;
+        if (state.scenario.revealPayoffs && typeof e.payoff === 'number') s += ` (payoff ${e.payoff})`;
+        if (state.scenario.shareReasoning && e.reasoning) s += ` — ${e.reasoning}`;
+        return s;
+      });
+      lines.push(`Round ${r.roundIndex}: ${parts.join('; ')}`);
+    });
+  }
+  lines.push('', `This is round ${roundIndex} of ${totalRounds}.`,
+    'Reply with ONLY a JSON object: {"choice": "<one of the exact choice strings above>", "reasoning": "<one or two sentences>"}. No other text.');
+  return lines.join('\n');
+}
+
+async function runRound(){
+  if (state.running) return;
+  if (!state.agents.length) { showNotice('Add at least one agent first.'); return; }
+  if (getOptions().length < 2) { showNotice('Give at least two choices, comma-separated.'); return; }
+  const missing = state.agents.filter(a => !a.apiKey || !a.model || (a.provider === 'custom' && !a.baseUrl));
+  if (missing.length) { showNotice(`Missing setup for: ${missing.map(a => a.name).join(', ')}`); return; }
+  const mode = state.scenario.payoffMode;
+  if (mode === 'freetext' && !(state.scenario.rewardText || '').trim()) { showNotice('Write the reward rules first, or switch the scoring mode.'); return; }
+  if (mode === 'count' && (state.agents.length < 2 || countColumns() === null)) { showNotice('The group-count table is unavailable for this many choices and agents. Adjust them or pick another scoring mode.'); return; }
+
+  state.running = true;
+  renderRunbar();
+  const roundIndex = state.rounds.length + 1;
+  const prompt = buildUserPrompt(roundIndex, state.scenario.rounds);
+
+  const results = await Promise.all(state.agents.map(async agent => {
+    try {
+      const text = await callProvider(agent, agent.persona.trim(), prompt);
+      const parsed = extractChoice(text, getOptions());
+      return { agentId: agent.id, choice: parsed.choice, reasoning: parsed.reasoning, raw: parsed.raw, error: null };
+    } catch(err) {
+      return { agentId: agent.id, choice: null, reasoning: '', raw: '', error: err.message || String(err) };
+    }
+  }));
+
+  const scored = await scoreRound(results, roundIndex);
+  state.rounds.push({ roundIndex, entries: scored.entries, payoffNote: scored.note || '', payoffError: scored.error || '' });
+  state.running = false;
+  persist();
+  renderRunbar();
+  renderLog();
+  renderEvolution();
+}
+
+async function runAllRemaining(){
+  if (state.running) return;
+  while (state.rounds.length < state.scenario.rounds) {
+    await runRound();
+    if (state.rounds.length && state.rounds[state.rounds.length - 1].entries.every(e => e.error)) break;
+  }
+}
+
+async function testAgent(agentId){
+  const agent = state.agents.find(a => a.id === agentId);
+  if (!agent) return;
+  const card = document.querySelector(`.agent-card[data-id="${agentId}"]`);
+  const status = card.querySelector('[data-role="status"]');
+  if (!agent.apiKey || !agent.model || (agent.provider === 'custom' && !agent.baseUrl)) {
+    status.textContent = 'Fill in provider, model, and key first.';
+    status.className = 'agent-status err';
+    return;
+  }
+  status.textContent = 'Testing…';
+  status.className = 'agent-status';
+  try {
+    const text = await callProvider(agent, agent.persona.trim(), 'Reply with exactly one word: OK');
+    status.textContent = text.toLowerCase().includes('ok') ? 'Key works.' : `Responded: ${text.slice(0,80)}`;
+    status.className = 'agent-status ok';
+  } catch(err) {
+    status.textContent = err.message || String(err);
+    status.className = 'agent-status err';
+  }
+}
+
+/* ---- events ---- */
+
+function bindScenario(){
+  document.getElementById('rules').addEventListener('input', e => { state.scenario.rules = e.target.value; persist(); });
+  document.getElementById('options').addEventListener('input', e => {
+    state.scenario.options = e.target.value;
+    rebuildMatrixStructure();
+    rebuildCountMatrix();
+    persist();
+    renderRewards();
+    renderEvolution();
+  });
+  document.getElementById('rounds').addEventListener('input', e => { state.scenario.rounds = Math.max(1, Number(e.target.value) || 1); persist(); renderRunbar(); });
+  document.getElementById('revealNames').addEventListener('change', e => { state.scenario.revealNames = e.target.checked; persist(); });
+  document.getElementById('shareReasoning').addEventListener('change', e => { state.scenario.shareReasoning = e.target.checked; persist(); });
+  document.getElementById('revealPayoffs').addEventListener('change', e => { state.scenario.revealPayoffs = e.target.checked; persist(); });
+}
+
+function bindMatrix(){
+  document.getElementById('payoffMode').addEventListener('change', e => {
+    state.scenario.payoffMode = e.target.value;
+    rebuildCountMatrix();
+    persist();
+    renderRewards();
+    renderEvolution();
+  });
+  document.getElementById('matrixWrap').addEventListener('input', e => {
+    if (e.target.tagName !== 'INPUT') return;
+    const row = e.target.dataset.row, col = e.target.dataset.col;
+    if (!state.scenario.matrix[row]) state.scenario.matrix[row] = {};
+    state.scenario.matrix[row][col] = Number(e.target.value) || 0;
+    persist();
+  });
+  document.getElementById('countWrap').addEventListener('input', e => {
+    if (e.target.tagName !== 'INPUT') return;
+    const row = e.target.dataset.row, key = e.target.dataset.key;
+    if (!state.scenario.countMatrix[row]) state.scenario.countMatrix[row] = {};
+    state.scenario.countMatrix[row][key] = Number(e.target.value) || 0;
+    persist();
+  });
+  document.getElementById('rewardText').addEventListener('input', e => { state.scenario.rewardText = e.target.value; persist(); });
+  document.getElementById('refereeSelect').addEventListener('change', e => { state.scenario.refereeId = e.target.value; persist(); });
+}
+
+function bindRoster(){
+  document.getElementById('addAgent').addEventListener('click', () => {
+    state.agents.push({ id: uid(), name: `Agent ${state.agents.length + 1}`, provider: 'openai', model: '', baseUrl: '', apiKey: '', temperature: 0.7, maxTokens: 300, extraParams: '', persona: '' });
+    rebuildCountMatrix();
+    persist(); renderAgents(); renderRewards(); renderEvolution();
+  });
+
+  document.getElementById('roster').addEventListener('input', e => {
+    const card = e.target.closest('.agent-card');
+    if (!card) return;
+    const agent = state.agents.find(a => a.id === card.dataset.id);
+    if (!agent) return;
+    const field = e.target.dataset.field;
+    if (!field) return;
+    if (field === 'temperature' || field === 'maxTokens') agent[field] = Number(e.target.value);
+    else agent[field] = e.target.value;
+    if (field !== 'apiKey') persist();
+    if (field === 'name') { const av = card.querySelector('.avatar'); if (av) av.textContent = (e.target.value.trim().charAt(0) || '?').toUpperCase(); renderEvolution(); if (state.scenario.payoffMode === 'freetext') renderReferee(); }
+    if (field === 'model' && state.scenario.payoffMode === 'freetext') renderReferee();
+  });
+
+  document.getElementById('roster').addEventListener('change', e => {
+    if (e.target.dataset.field === 'provider') {
+      const card = e.target.closest('.agent-card');
+      const agent = state.agents.find(a => a.id === card.dataset.id);
+      agent.provider = e.target.value;
+      persist();
+      renderAgents();
+    }
+  });
+
+  document.getElementById('roster').addEventListener('click', e => {
+    const card = e.target.closest('.agent-card');
+    if (!card) return;
+    const action = e.target.dataset.action;
+    if (action === 'remove') {
+      state.agents = state.agents.filter(a => a.id !== card.dataset.id);
+      rebuildCountMatrix();
+      persist(); renderAgents(); renderLog(); renderRewards(); renderEvolution();
+    } else if (action === 'test') {
+      testAgent(card.dataset.id);
+    }
+  });
+}
+
+function bindRun(){
+  document.getElementById('runOne').addEventListener('click', runRound);
+  document.getElementById('runAll').addEventListener('click', runAllRemaining);
+}
+
+function clearResults(){
+  state.rounds = [];
+  persist();
+  renderRunbar();
+  renderLog();
+  renderEvolution();
+}
+
+function disarmClear(btn){
+  btn.dataset.armed = '';
+  btn.textContent = btn.dataset.label;
+}
+
+function bindClear(){
+  document.querySelectorAll('[data-clear]').forEach(btn => {
+    btn.dataset.label = btn.textContent;
+    btn.addEventListener('click', () => {
+      if (state.running) { showNotice('Wait for the current round to finish before clearing.'); return; }
+      if (btn.dataset.armed === '1') {
+        document.querySelectorAll('[data-clear]').forEach(disarmClear);
+        clearResults();
+        showNotice('Results cleared. Agents and rules are unchanged.');
+        return;
+      }
+      btn.dataset.armed = '1';
+      btn.textContent = 'Click again to clear all rounds';
+      clearTimeout(btn._t);
+      btn._t = setTimeout(() => disarmClear(btn), 4000);
+    });
+  });
+}
+
+function toCsv(){
+  const rows = [['round','agent','choice','payoff','reasoning','error']];
+  state.rounds.forEach(r => r.entries.forEach(e => {
+    const agent = state.agents.find(a => a.id === e.agentId);
+    rows.push([r.roundIndex, agent ? agent.name : '', e.choice || '', typeof e.payoff === 'number' ? e.payoff : '', (e.reasoning||'').replace(/\n/g,' '), e.error||'']);
+  }));
+  return rows.map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+}
+
+function fullExport(){
+  return {
+    scenario: state.scenario,
+    refereeAgent: state.scenario.payoffMode === 'freetext' ? ((state.agents.find(a => a.id === state.scenario.refereeId) || {}).name || null) : null,
+    agents: state.agents.map(a => ({ name: a.name, provider: a.provider, model: a.model, baseUrl: a.baseUrl, temperature: a.temperature, maxTokens: a.maxTokens, persona: a.persona })),
+    rounds: state.rounds
+  };
+}
+
+let downloadsCapability = null;
+
+async function downloadFile(filename, content, mime){
+  if (downloadsCapability) {
+    try {
+      await downloadsCapability.save({ filename, data: content });
+      showNotice(`${filename} ready to save.`);
+      return;
+    } catch(err) {
+      showNotice(err && err.code === 'declined' ? 'Download cancelled.' : 'Download could not be saved — try Copy instead.');
+      return;
+    }
+  }
+  try {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch(e) {
+    showNotice('Download failed — use Copy instead.');
+  }
+}
+
+async function copyToClipboard(text, label){
+  try {
+    await navigator.clipboard.writeText(text);
+    showNotice(`${label} copied to clipboard.`);
+  } catch(e) {
+    showNotice(`Could not copy automatically — select and copy ${label} manually.`);
+  }
+}
+
+function bindExport(){
+  document.getElementById('copyJson').addEventListener('click', () => copyToClipboard(JSON.stringify(fullExport(), null, 2), 'JSON'));
+  document.getElementById('copyCsv').addEventListener('click', () => copyToClipboard(toCsv(), 'CSV'));
+  document.getElementById('downloadJson').addEventListener('click', () => downloadFile('agent-arena-export.json', JSON.stringify(fullExport(), null, 2), 'application/json'));
+  document.getElementById('downloadCsv').addEventListener('click', () => downloadFile('agent-arena-results.csv', toCsv(), 'text/csv'));
+}
+
+async function start(){
+  rebuildMatrixStructure();
+  rebuildCountMatrix();
+  renderScenario();
+  bindScenario();
+  bindMatrix();
+  bindRoster();
+  bindRun();
+  bindClear();
+  bindExport();
+  renderAll();
+  let resizeTimer;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(renderEvolution, 150); });
+  if (window.claude && typeof window.claude.use === 'function') {
+    try { downloadsCapability = await window.claude.use('downloads'); } catch(e) { downloadsCapability = null; }
+  }
+}
+
+if (window.claude?.hot?.ready) {
+  window.claude.hot.ready(start);
+} else {
+  start();
+}
+})();
+</script>

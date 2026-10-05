@@ -95,6 +95,11 @@ button.ghost{background:transparent}
 button.small{padding:5px 12px; font-size:.82rem; border-radius:8px}
 button:disabled{opacity:.45; cursor:not-allowed}
 .hint{font-size:.82rem; color:var(--muted); line-height:1.5; margin:0}
+.privacy-declaration{border-color:color-mix(in srgb, var(--accent) 45%, var(--border))}
+.privacy-declaration strong{color:var(--fg)}
+.privacy-list{margin:0; padding-left:18px; color:var(--muted); font-size:.88rem}
+.privacy-list li + li{margin-top:4px}
+.db-status{font-family:var(--font-mono); color:var(--muted); font-size:.82rem}
 
 /* switches */
 input[type=checkbox]{appearance:none; -webkit-appearance:none; flex:none; width:34px; height:20px; padding:0; border-radius:999px; background:var(--border); border:none; position:relative; cursor:pointer; transition:background .15s}
@@ -208,17 +213,28 @@ footer{color:var(--muted); font-size:.8rem; line-height:1.55; border-top:1px sol
 <header class="hero">
   <div class="hero-top">
     <div class="glyph" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-    <span class="eyebrow">Estee's Mini-Project on Agent Simulations</span>
+    <span class="eyebrow">Estee's Mini-Project</span>
   </div>
-  <h1>Agent<em> Arena</em></h1>
-  <p class="lede">Give LLM agents a persona and a shared scenario, then watch what they choose, round after round. Each agent calls its provider's API straight from this page with the key you give it below. Nothing is saved to a server or sent anywhere else.</p>
+  <h1>Agent <em>Arena</em></h1>
+  <p class="lede">Give LLM agents a persona and a shared scenario, then watch what they choose, round after round. Each agent calls its provider's API straight from this page, and completed rounds are saved into this browser's experiment database for later review.</p>
   <nav class="steps" aria-label="Jump to a section">
     <a href="#scenario-card"><b>1</b>Frame the game</a>
     <a href="#roster-card"><b>2</b>Cast the agents</a>
     <a href="#run-card"><b>3</b>Run the rounds</a>
     <a href="#evo-card"><b>4</b>Read the outcome</a>
+    <a href="#privacy-card"><b>5</b>Privacy</a>
   </nav>
 </header>
+
+<section class="card privacy-declaration" id="privacy-card">
+  <h2>Privacy declaration</h2>
+  <p class="sub"><strong>Main purpose:</strong> the experiment database helps understand what kinds of tasks are being conducted on this webpage.</p>
+  <ul class="privacy-list">
+    <li>When a round completes, this page stores the scenario, rules, choices, agent personas, provider/model settings, full prompts sent to models, model replies, parsed choices, reasoning, scoring rules, and results.</li>
+    <li><strong>API keys are excluded.</strong> Values typed into API key fields are kept only in this tab's memory for provider calls and are never written into the experiment database, draft storage, or exports.</li>
+    <li>Any secret typed outside the API key fields, such as inside rules, personas, endpoint URLs, or extra parameters, is treated as experiment content and may be saved.</li>
+  </ul>
+</section>
 
 <section class="card" id="scenario-card">
   <h2>The scenario</h2>
@@ -283,7 +299,7 @@ footer{color:var(--muted); font-size:.8rem; line-height:1.55; border-top:1px sol
     <h2>Agents</h2>
     <button id="addAgent" class="small">+ Add agent</button>
   </div>
-  <p class="hint">Each agent needs its own provider and API key. Keys live only in this tab's memory for this session — they're cleared on reload and never written to disk or sent to us.</p>
+  <p class="hint">Each agent needs its own provider and API key. Keys live only in this tab's memory for this session — they're cleared on reload and never written to the draft, experiment database, or exports.</p>
   <div class="roster" id="roster"></div>
 </section>
 
@@ -316,8 +332,21 @@ footer{color:var(--muted); font-size:.8rem; line-height:1.55; border-top:1px sol
       <button id="downloadJson" class="small primary">Download full export (JSON)</button>
     </div>
   </div>
-  <p class="hint">The CSV is the tidy round-by-round choices and payoffs. The JSON export also includes the full game design — scenario, rules, matrix and agent setups (no API keys). Downloading will ask you to confirm a save. If that's unavailable wherever this page is open, copy the data instead: <button id="copyCsv" class="small ghost">Copy CSV</button> <button id="copyJson" class="small ghost">Copy JSON</button></p>
+  <p class="hint">The CSV is the tidy round-by-round choices and payoffs. The JSON export also includes the full game design, agent setups, and prompt log (no API keys). Downloading will ask you to confirm a save. If that's unavailable wherever this page is open, copy the data instead: <button id="copyCsv" class="small ghost">Copy CSV</button> <button id="copyJson" class="small ghost">Copy JSON</button></p>
   <div id="log"></div>
+</section>
+
+<section class="card" id="database-card">
+  <div class="row" style="justify-content:space-between; align-items:center">
+    <h2>Experiment database</h2>
+    <span class="db-status" id="databaseStatus">Checking database…</span>
+  </div>
+  <p class="hint">This browser database keeps one record per completed round, including the full prompt package and results, with API key fields removed. Use export to inspect the collected experiment records.</p>
+  <div class="export-group">
+    <button id="downloadDatabase" class="small primary">Download experiment database</button>
+    <button id="copyDatabase" class="small ghost">Copy experiment database</button>
+    <button id="clearDatabase" class="small ghost">Clear experiment database</button>
+  </div>
 </section>
 
 <footer>
@@ -370,6 +399,7 @@ const DEFAULT_AGENTS = [
 ];
 
 function uid(){ return 'a' + Math.random().toString(36).slice(2,10); }
+function experimentUid(){ return 'exp-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8); }
 
 function loadState(){
   let saved = null;
@@ -385,7 +415,9 @@ function loadState(){
   let agents = (saved && saved.agents && saved.agents.length) ? saved.agents : DEFAULT_AGENTS.map(a => Object.assign({id: uid()}, a));
   agents = agents.map(a => Object.assign({apiKey:""}, a, {apiKey:""}));
   const rounds = (saved && saved.rounds) || [];
-  return { scenario, agents, rounds, running:false };
+  const promptLog = (saved && Array.isArray(saved.promptLog)) ? saved.promptLog : [];
+  const experimentSessionId = (saved && saved.experimentSessionId) || experimentUid();
+  return { scenario, agents, rounds, promptLog, experimentSessionId, running:false };
 }
 
 const state = loadState();
@@ -393,7 +425,7 @@ const state = loadState();
 function persist(){
   try {
     const safeAgents = state.agents.map(a => { const c = Object.assign({}, a); delete c.apiKey; return c; });
-    localStorage.setItem('agentArenaDraft', JSON.stringify({ scenario: state.scenario, agents: safeAgents, rounds: state.rounds }));
+    localStorage.setItem('agentArenaDraft', JSON.stringify({ scenario: state.scenario, agents: safeAgents, rounds: state.rounds, promptLog: state.promptLog, experimentSessionId: state.experimentSessionId }));
   } catch(e){ /* storage unavailable — continue without persistence */ }
 }
 
@@ -408,6 +440,116 @@ function showNotice(msg){
   el.classList.add('show');
   clearTimeout(showNotice._t);
   showNotice._t = setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+const EXPERIMENT_DB_NAME = 'agentArenaExperimentDatabase';
+const EXPERIMENT_DB_VERSION = 1;
+const EXPERIMENT_STORE = 'roundRecords';
+let experimentDbPromise = null;
+
+function openExperimentDb(){
+  if (experimentDbPromise) return experimentDbPromise;
+  if (!('indexedDB' in window)) return Promise.reject(new Error('IndexedDB is not available in this browser.'));
+  experimentDbPromise = new Promise((resolve, reject) => {
+    const req = indexedDB.open(EXPERIMENT_DB_NAME, EXPERIMENT_DB_VERSION);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(EXPERIMENT_STORE)) {
+        const store = db.createObjectStore(EXPERIMENT_STORE, { keyPath: 'id' });
+        store.createIndex('experimentId', 'experimentId', { unique: false });
+        store.createIndex('createdAt', 'createdAt', { unique: false });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error || new Error('Could not open experiment database.'));
+  });
+  return experimentDbPromise;
+}
+
+function transactionDone(tx){
+  return new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error || new Error('Database transaction failed.'));
+    tx.onabort = () => reject(tx.error || new Error('Database transaction aborted.'));
+  });
+}
+
+function cloneForStorage(value){
+  return JSON.parse(JSON.stringify(value, (key, val) => {
+    if (String(key).toLowerCase() === 'apikey') return undefined;
+    return val;
+  }));
+}
+
+function agentForStorage(agent){
+  return cloneForStorage({
+    id: agent.id,
+    name: agent.name,
+    provider: agent.provider,
+    model: agent.model,
+    baseUrl: agent.baseUrl,
+    temperature: agent.temperature,
+    maxTokens: agent.maxTokens,
+    extraParams: agent.extraParams,
+    persona: agent.persona
+  });
+}
+
+function makeExperimentRecord(round, promptPackage){
+  const now = new Date().toISOString();
+  return cloneForStorage({
+    id: `${state.experimentSessionId}-round-${round.roundIndex}-${Date.now()}`,
+    experimentId: state.experimentSessionId,
+    createdAt: now,
+    purpose: 'Understand what kinds of tasks are being conducted on this webpage.',
+    privacy: {
+      apiKeysExcluded: true,
+      note: 'API key field values are intentionally omitted from this record. Other experiment text, including prompts and personas, is retained.'
+    },
+    scenario: state.scenario,
+    agents: state.agents.map(agentForStorage),
+    promptPackage,
+    round,
+    roundsSoFar: state.rounds
+  });
+}
+
+async function saveExperimentRecord(round, promptPackage){
+  const record = makeExperimentRecord(round, promptPackage);
+  const db = await openExperimentDb();
+  const tx = db.transaction(EXPERIMENT_STORE, 'readwrite');
+  tx.objectStore(EXPERIMENT_STORE).put(record);
+  await transactionDone(tx);
+}
+
+async function readExperimentRecords(){
+  const db = await openExperimentDb();
+  return await new Promise((resolve, reject) => {
+    const tx = db.transaction(EXPERIMENT_STORE, 'readonly');
+    const req = tx.objectStore(EXPERIMENT_STORE).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error || new Error('Could not read experiment records.'));
+  });
+}
+
+async function clearExperimentDatabase(){
+  const db = await openExperimentDb();
+  const tx = db.transaction(EXPERIMENT_STORE, 'readwrite');
+  tx.objectStore(EXPERIMENT_STORE).clear();
+  await transactionDone(tx);
+}
+
+async function updateDatabaseStatus(){
+  const el = document.getElementById('databaseStatus');
+  if (!el) return;
+  try {
+    const records = await readExperimentRecords();
+    records.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    const last = records[0] ? new Date(records[0].createdAt).toLocaleString() : 'never';
+    el.textContent = `${records.length} record${records.length === 1 ? '' : 's'} · last saved ${last}`;
+  } catch(err) {
+    el.textContent = 'Database unavailable';
+  }
 }
 
 function getOptions(){
@@ -726,10 +868,23 @@ async function computeFreeText(entries, roundIndex){
   scored.forEach(e => lines.push(`- ${nameOf(e.agentId)}: ${e.choice}`));
   lines.push('', 'Work out each listed participant\'s payoff for this round under the rules. Reply with ONLY a JSON object: {"payoffs": {"<participant name>": <number>, ...}, "explanation": "<brief working>"}. No other text.');
 
+  const refereeUserPrompt = lines.join('\n');
+  const refereePrompt = {
+    refereeAgentId: referee.id,
+    refereeAgentName: referee.name,
+    provider: referee.provider,
+    model: referee.model,
+    baseUrl: referee.baseUrl,
+    temperature: 0,
+    maxTokens: Math.max(Number(referee.maxTokens) || 0, 800),
+    systemPrompt: REFEREE_SYSTEM,
+    userPrompt: refereeUserPrompt
+  };
+
   try {
-    const text = await callProvider(Object.assign({}, referee, { temperature: 0, maxTokens: Math.max(Number(referee.maxTokens) || 0, 800) }), REFEREE_SYSTEM, lines.join('\n'));
+    const text = await callProvider(Object.assign({}, referee, { temperature: 0, maxTokens: Math.max(Number(referee.maxTokens) || 0, 800) }), REFEREE_SYSTEM, refereeUserPrompt);
     const start = text.indexOf('{'), end = text.lastIndexOf('}');
-    if (start < 0 || end < start) return { entries: none, error: `unreadable reply: ${text.slice(0, 120)}` };
+    if (start < 0 || end < start) return { entries: none, error: `unreadable reply: ${text.slice(0, 120)}`, refereePrompt, refereeRaw: text };
     const obj = JSON.parse(text.slice(start, end + 1));
     const table = obj.payoffs || {};
     const byName = {};
@@ -738,9 +893,9 @@ async function computeFreeText(entries, roundIndex){
       const v = byName[nameOf(e.agentId).trim().toLowerCase()];
       return Object.assign({}, e, { payoff: Number.isFinite(v) ? v : null });
     });
-    return { entries: out, note: String(obj.explanation || '') };
+    return { entries: out, note: String(obj.explanation || ''), refereePrompt, refereeRaw: text };
   } catch(err) {
-    return { entries: none, error: err.message || String(err) };
+    return { entries: none, error: err.message || String(err), refereePrompt };
   }
 }
 
@@ -1033,19 +1188,53 @@ async function runRound(){
   const prompt = buildUserPrompt(roundIndex, state.scenario.rounds);
 
   const results = await Promise.all(state.agents.map(async agent => {
+    const promptTrace = {
+      agentId: agent.id,
+      agentName: agent.name,
+      provider: agent.provider,
+      model: agent.model,
+      baseUrl: agent.baseUrl,
+      temperature: Number(agent.temperature),
+      maxTokens: Number(agent.maxTokens) || 300,
+      extraParams: agent.extraParams || '',
+      systemPrompt: agent.persona.trim(),
+      userPrompt: prompt
+    };
     try {
-      const text = await callProvider(agent, agent.persona.trim(), prompt);
+      const text = await callProvider(agent, promptTrace.systemPrompt, promptTrace.userPrompt);
       const parsed = extractChoice(text, getOptions());
-      return { agentId: agent.id, choice: parsed.choice, reasoning: parsed.reasoning, raw: parsed.raw, error: null };
+      return { agentId: agent.id, choice: parsed.choice, reasoning: parsed.reasoning, raw: parsed.raw, error: null, promptTrace };
     } catch(err) {
-      return { agentId: agent.id, choice: null, reasoning: '', raw: '', error: err.message || String(err) };
+      return { agentId: agent.id, choice: null, reasoning: '', raw: '', error: err.message || String(err), promptTrace };
     }
   }));
 
-  const scored = await scoreRound(results, roundIndex);
-  state.rounds.push({ roundIndex, entries: scored.entries, payoffNote: scored.note || '', payoffError: scored.error || '' });
+  const entriesForScoring = results.map(r => ({ agentId: r.agentId, choice: r.choice, reasoning: r.reasoning, raw: r.raw, error: r.error }));
+  const scored = await scoreRound(entriesForScoring, roundIndex);
+  const round = { roundIndex, entries: scored.entries, payoffNote: scored.note || '', payoffError: scored.error || '' };
+  const promptPackage = {
+    roundIndex,
+    generatedAt: new Date().toISOString(),
+    sharedUserPrompt: prompt,
+    agentPrompts: results.map(r => Object.assign({}, r.promptTrace, {
+      rawResponse: r.raw,
+      parsedChoice: r.choice,
+      parsedReasoning: r.reasoning,
+      error: r.error
+    })),
+    refereePrompt: scored.refereePrompt || null,
+    refereeRaw: scored.refereeRaw || ''
+  };
+  state.rounds.push(round);
+  state.promptLog.push(promptPackage);
   state.running = false;
   persist();
+  try {
+    await saveExperimentRecord(round, promptPackage);
+    await updateDatabaseStatus();
+  } catch(err) {
+    showNotice(`Round saved, but database logging failed: ${err.message || err}`);
+  }
   renderRunbar();
   renderLog();
   renderEvolution();
@@ -1177,6 +1366,8 @@ function bindRun(){
 
 function clearResults(){
   state.rounds = [];
+  state.promptLog = [];
+  state.experimentSessionId = experimentUid();
   persist();
   renderRunbar();
   renderLog();
@@ -1218,9 +1409,17 @@ function toCsv(){
 
 function fullExport(){
   return {
+    exportedAt: new Date().toISOString(),
+    experimentId: state.experimentSessionId,
+    purpose: 'Understand what kinds of tasks are being conducted on this webpage.',
+    privacy: {
+      apiKeysExcluded: true,
+      note: 'API key field values are not included. Other experiment text, including prompts and personas, is included.'
+    },
     scenario: state.scenario,
     refereeAgent: state.scenario.payoffMode === 'freetext' ? ((state.agents.find(a => a.id === state.scenario.refereeId) || {}).name || null) : null,
-    agents: state.agents.map(a => ({ name: a.name, provider: a.provider, model: a.model, baseUrl: a.baseUrl, temperature: a.temperature, maxTokens: a.maxTokens, persona: a.persona })),
+    agents: state.agents.map(a => ({ name: a.name, provider: a.provider, model: a.model, baseUrl: a.baseUrl, temperature: a.temperature, maxTokens: a.maxTokens, extraParams: a.extraParams, persona: a.persona })),
+    promptLog: state.promptLog,
     rounds: state.rounds
   };
 }
@@ -1268,6 +1467,61 @@ function bindExport(){
   document.getElementById('downloadCsv').addEventListener('click', () => downloadFile('agent-arena-results.csv', toCsv(), 'text/csv'));
 }
 
+async function experimentDatabaseExport(){
+  const records = await readExperimentRecords();
+  records.sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
+  return {
+    exportedAt: new Date().toISOString(),
+    purpose: 'Understand what kinds of tasks are being conducted on this webpage.',
+    privacy: {
+      apiKeysExcluded: true,
+      note: 'API key field values are not included in these database records. Other experiment text, including prompts and personas, is included.'
+    },
+    records
+  };
+}
+
+function bindDatabase(){
+  document.getElementById('downloadDatabase').addEventListener('click', async () => {
+    try {
+      const payload = await experimentDatabaseExport();
+      await downloadFile('agent-arena-experiment-database.json', JSON.stringify(payload, null, 2), 'application/json');
+    } catch(err) {
+      showNotice(`Could not export database: ${err.message || err}`);
+    }
+  });
+  document.getElementById('copyDatabase').addEventListener('click', async () => {
+    try {
+      const payload = await experimentDatabaseExport();
+      await copyToClipboard(JSON.stringify(payload, null, 2), 'experiment database');
+    } catch(err) {
+      showNotice(`Could not copy database: ${err.message || err}`);
+    }
+  });
+  document.getElementById('clearDatabase').addEventListener('click', async e => {
+    const btn = e.currentTarget;
+    if (btn.dataset.armed === '1') {
+      btn.dataset.armed = '';
+      btn.textContent = 'Clear experiment database';
+      try {
+        await clearExperimentDatabase();
+        await updateDatabaseStatus();
+        showNotice('Experiment database cleared.');
+      } catch(err) {
+        showNotice(`Could not clear database: ${err.message || err}`);
+      }
+      return;
+    }
+    btn.dataset.armed = '1';
+    btn.textContent = 'Click again to delete records';
+    clearTimeout(btn._t);
+    btn._t = setTimeout(() => {
+      btn.dataset.armed = '';
+      btn.textContent = 'Clear experiment database';
+    }, 4000);
+  });
+}
+
 async function start(){
   rebuildMatrixStructure();
   rebuildCountMatrix();
@@ -1278,7 +1532,9 @@ async function start(){
   bindRun();
   bindClear();
   bindExport();
+  bindDatabase();
   renderAll();
+  updateDatabaseStatus();
   let resizeTimer;
   window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(renderEvolution, 150); });
   if (window.claude && typeof window.claude.use === 'function') {
